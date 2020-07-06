@@ -2,7 +2,7 @@
 #define MATRIX_MAT_H  1
 
 #include <stdio.h>
-#include <list.h>
+#include "../list/list.h"
 #include "error-mat.h" 
 
 #define N_BUF_LENGTH   2048
@@ -145,17 +145,17 @@ error_t clear_matrix(matrix_t *m);
 /***
  * Carga la fila "pos" de la matriz ma en la lista "l"
  */
-error_t get_row(unsigned int pos, const matrix_t *ma, list_t *l);
+error_t get_row(unsigned int pos, const matrix_t *ma, t_list *l);
 
 /***
  * Carga la columna "pos" de la matriz "ma" en la lista "l"
  */
-error_t get_col(unsigned int pos, const matrix_t *ma, list_t *l);
+error_t get_col(unsigned int pos, const matrix_t *ma, t_list *l);
 
 /***
  * Pasa la matriz "ma" a la lista "l"
  */
-error_t matrix2list(const matrix_t *ma, list_t *l);
+error_t matrix2list(const matrix_t *ma, t_list *l);
 
 /***
  * Redimensiona la matriz "ma" a las dimensiones "newrows*newcols"
