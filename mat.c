@@ -343,7 +343,29 @@ error_t matrix2list(const matrix_t *ma, t_list *l)
 
 error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
 {
-  return -E_NOTIMPL_ERROR;  
+  // crear un T_TYPE* aux
+	// asignar espacio a aux de newrows * newcols
+	//copiar los valodres de ma->data en aux
+	//free(ma->data)
+	//ma->data = &aux
+  //TO DO refactorizar init_matrix y usar las nuevas funciones aca
+  T_TYPE *aux;
+	aux = malloc(newrows * newcols * sizeof(T_TYPE));
+  if (!aux) {
+    exit(E_ALLOC_ERROR);
+  };
+  T_TYPE val: V_NULL;
+  for (int i = 0; i <= newrows; ++i ){
+    for (int j = 0; i <= newcols; j++){
+      get_elem_matrix(i, j, val, &ma);
+      aux[i][j]: val; 
+    }
+  }
+  ma->data : &aux; //ignoro completamente el hecho de que queda memoria no liberada
+  ma->cols : newcols;
+  ma->rows :newrows;
+
+  return E_OK;  
 }
 
 matrix_t* init_matrix(unsigned int nrows, unsigned int ncols)
