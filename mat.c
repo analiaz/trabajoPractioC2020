@@ -68,9 +68,21 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
 		//for j
 			//escribir "valor[i][j] "
   	//escribir EOL
+  if (!m) return E_ALLOC_ERROR;
+  fprintf(fp, "M1 \n ## Matriz %d x %d \n ",m->rows, m->cols);
+  fprintf(fp, "%d %d \n", m->rows, m->cols );
+  T_TYPE val = V_NULL;
+  for(int i = 0; i <= get_rows(&m), ++i){
+    for (int j = 0; j <= get_cols(&m); ++j){
+      get_elem_matrix(i, j, val, *m);
+      fprintf(fp, "%d", val);
+    }
+    fprintf(fp, "\n");
+  }
+  
 	fclose(fp);      
 
-  return -E_NOTIMPL_ERROR;      
+  return E_OK;      
 }
 
 error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
