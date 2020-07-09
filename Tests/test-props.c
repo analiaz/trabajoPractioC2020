@@ -47,9 +47,9 @@
 #include <stdlib.h>                     /* exit */
 #include <getopt.h>                     /* getopt */
 #include <stdbool.h>                    /* Booleans */
-#include <mat.h>
-#include <error-mat.h>
-#include <list.h>
+#include "mat.h"
+#include "error-mat.h"
+#include "../list/list.h"
 
 extern char *optarg;
 extern int  opterr;

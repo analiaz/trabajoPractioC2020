@@ -53,6 +53,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 				//Termina el modulo
 			}
 		}
+    fclose(fp);
 		return E_OK;
 	}	
 	//Si no es M1 el archivo, en este caso no se hace nada
