@@ -118,17 +118,17 @@ error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
         }
       } return E_OK;
   	} else return E_ALLOC_ERROR;
-  } else return E_SIZE_ERROR;
+  } else return ERROR_INCOMPATIBLE_MATRICES;
 }     
 
 error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst)
 {
   if (!m_src) return E_ALLOC_ERROR;
   if (!m_dst) return E_ALLOC_ERROR;
-  if (check_dimentions(*m_src, get_rows(&m_src), get_cols(&m_src)){
+  if (check_dimentions(*m_src, get_rows(&m_dst), get_cols(&m_dst) == E_OK){
   	T_TYPE res_src = V_VALUE;
     T_TYPE res_dst = V_VALUE;
-	T_TYPE res = V_VALUE;
+	  T_TYPE res = V_VALUE;
     for ( int i = 0; i <= get_rows(&m_src), ++i){
       for (int j = 0; j <= get_cols(&m_src), ++j) {
         if (!(get_elem_matrix(i, j, &res_src, &m_src)) && !(get_elem_matrix(i, j, &res_dst, &m_dst))){
@@ -138,15 +138,14 @@ error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst)
     	} 
     } return E_OK
   }
-  return -E_NOTIMPL_ERROR;      
-   
+  return ERROR_INCOMPATIBLE_MATRICES;      
 }
 
 error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
 {
   if (!mb) return E_ALLOC_ERROR;
   if (!mc) return E_ALLOC_ERROR;
-  if (check_dimentions(*mb, get_rows(&mc), get_cols(&mc)){
+  if (check_dimentions(*mb, get_rows(&mc), get_cols(&mc) == E_OK){
   	T_TYPE res = V_VALUE;
     for (int i = 0 ; i <= get_rows(&mc); ++i){
       for (int j = 0; j <= get_cols(&mc); ++j) {
@@ -157,7 +156,7 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
       }
     }
   	return E_OK;    
-  } else return E_NOTIMPL_ERROR;      
+  } else return ERROR_INCOMPATIBLE_MATRICES;      
 }
 
 error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst)
@@ -212,7 +211,7 @@ error_t null_matrix(unsigned int n, matrix_t **mc)
 
 error_t idty_matrix(unsigned int n, matrix_t **m)
 {
-  null_matrix(n, m);
+  null_matrix(n, &m);
   for (int i=0 ; i <=n; i++) {
   	if (!set_element_matrix(i,i,1,m)) return E_SIZE_ERROR;
   }
@@ -223,7 +222,7 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
 {
   if (!ma) return E_ALLOC_ERROR;
   if (!mb) return E_ALLOC_ERROR;
-  if (check_dimentions(*ma, get_rows(&mb), get_cols(&mb)){
+  if (check_dimentions(*ma, get_rows(&mb), get_cols(&mb) == E_OK){
   	if (create_and_fill_matrix(get_row(&ma), get_col(&mb), V_NULL, &mc) {  
 		T_TYPE valA, valB, sum = 0;
      	for (int i = 0; i < get_rows(&ma); ++i) {
@@ -240,7 +239,7 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
     	}
     return E_ALLOC_ERROR;
   }
-  return E_SIZE_ERORR;
+  return ERROR_INCOMPATIBLE_MATRICES;
 } 
 
 error_t set_elem_matrix(unsigned int row, unsigned int col, T_TYPE value, matrix_t **m)

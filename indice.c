@@ -8,14 +8,124 @@
 #include <string.h>
 #include "LeerArchivo.h"
 
-typedef int error_t;
-#define 	E_OK    	 0
-#define	    E_READ_ERROR 1
-#define   E_FORMAT_ERROR 2
-#define   E_ALLOC_ERROR  3
-#define   E_SIZE_ERROR   4
-#define   E_WRITE_ERROR  5
-#define   ERROR_INCOMPATIBLE_MATRICES 6
+
+void procesar_funciones(char *arch1, char *arch2, char *archS, char *op, int scalar = 0){
+    matrix_t *ma, *mb, ms;
+
+    switch (ope) {
+        case 'dup' : 
+            /*leer la matriz
+            dup_matr que recibe una matriz y devuelveotra matriz
+            escribo la matriz (devolviendola en un file) */
+            FILE *f = fopen(&arch1,'r');
+            if ( e = (read_matrix(&f, *ma)) != E_OK) return e;
+            if (e = (dup_matrix(*ma, &ms)) != E_OK) return e;
+            FILE *f2 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        case 'sum' :
+            FILE *f1 = fopen(&arch1,'r');
+            FILE *f2 = fopen(&arch2,'r');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
+            if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
+            if (e = (sum(*ma, *mb, &ms)) != E_OK) return e;
+            FILE *f3 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+        case 'mult_scalar' :
+            FILE *f1 = fopen(&arch1,'w');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
+            if (e = (mult_scalar(scal, *ma, *ms)) != E_OK) return e;       
+            FILE *f2 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+        case 'mult' :
+            FILE *f1 = fopen(&arch1,'r');
+            FILE *f2 = fopen(&arch2,'r');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
+            if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
+            if (e = mult(*ma, *mb, &ms)) != E_OK) return e;
+            FILE *f3 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+        case 'idty' :
+            FILE *f1 = fopen(&arh1, 'r');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e; 
+            if (e = (idty_matrix(get_cols(*ma),&ms)) != E_OK) return e;
+            FILE *f2 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+        case 'null' :
+            FILE *f1 = fopen(&arh1, 'r');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e; 
+            if (e = (null_matrix(get_cols(*ma),&ms)) != E_OK) return e;
+            FILE *f2 = fopen(&archS,'w');
+            if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+            case 'cmp' :
+            FILE *f1 = fopen(&arch1,'r')
+            FILE *f2 = fopen(&archS,'r');
+            if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
+            if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
+            int n = cmp_matrix(*ma, *mb);
+            if (e = (create_and_fill_matrix(1, 1, n, &ms)) != E_OK) return e;     
+            if ( e = (write_matrix(&archS, *ms)) != E_OK) return e;
+            return E_OK;
+        break;
+        default: return E_FORMAT_ERROR;
+    }
+}
+
+/*
+● --calc archivo1 op​ archivo2 = archivo_salida
+○ Donde ​ op​ puede ser:
+■ +​ equivale a ​ sum
+■ *​ equivale a ​ mult
+● --calc archivo1 .* scalar = archivo_salida
+○ Donde “​ scalar” es un número en punto flotante, esta operación equivale a
+mult_scalar​
+.
+● --calc archivo1 id = archivo_salida
+○ id​ equivale a ​ ”idty”
+*/
+void calcular_(){
+    char *arch1, *arch2, *ope, *archS;
+    double scal;
+
+    if (argv[3] == "+") {
+        ope = "sum";
+        arch1 = argv[2]; 
+        arch2 = argv[4];
+        archS = rgv[6];
+    } else if (argv[3] == "*"){
+        ope = "mult";
+        arch1 = argv[2]; 
+        arch2 = argv[4];
+        archS = rgv[6];        
+    } else if (argv[3] == ".*") {
+        ope = "mult_scalar";
+        arch1 = argv[2];
+        scal = argv[4];
+        archS = argv[6];       
+    } else if (argv[3] == "id") {
+        ope = "idty_matrix";
+        arch1 = argv[2];
+        archS = argv[5];
+    } else
+        printf("Se a introducido mal alguna orden porfavor ingrese de nuevo");
+    }
+
+    procesar_funciones(arch1, arch2, archS, ope, scal);
+
+    return E_OK;
+    
+}
+
 
 int main(int argc, char *argv[]){
 
@@ -32,10 +142,16 @@ int main(int argc, char *argv[]){
 // -1 nom_arch -s numero (hay que convertirlo a numero atoi ostrtol)
 
 // si llega --help mostar solo lista de comandos y termina el programa?
+
     if(argc >= 2){
-        char *arch1, *arch2, *ope, *salida, *archS;
-        double scal;
         
+        if (argv[1] == "--calc") {
+            calcular_();
+        }
+
+        char *arch1, *arch2, *ope, *archS;
+        double scal;
+
         for (i=1; i <= argc; ++i){
             operador1 = argv[i];  // ahora guarde un comando
             switch (operador1) {
@@ -67,75 +183,12 @@ int main(int argc, char *argv[]){
                 default: return E_FORMAT_ERROR;
             }
         }
-        matrix_t *ma, *mb, ms;
-
-        switch (ope) {
-            case 'dup' : 
-                /*leer la matriz
-                dup_matr que recibe una matriz y devuelveotra matriz
-                escribo la matriz (devolviendola en un file) */
-                FILE *f = fopen(&arch1,'r');
-                if ( e = (read_matrix(&f, *ma)) != E_OK) return e;
-                if (e = (dup_matrix(*ma, &ms)) != E_OK) return e;
-                FILE *f2 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            case 'sum' :
-                FILE *f1 = fopen(&arch1,'r');
-                FILE *f2 = fopen(&arch2,'r');
-                if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
-                if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
-                if (e = (sum(*ma, *mb, &ms)) != E_OK) return e;
-                FILE *f3 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-            case 'mult_scalar' :
-                FILE *f1 = fopen(&arch1,'w');
-                if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
-                if (e = (mult_scalar(scal, *ma, *ms)) != E_OK) return e;       
-                FILE *f2 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-            case 'mult' :
-                FILE *f1 = fopen(&arch1,'r');
-                FILE *f2 = fopen(&arch2,'r');
-                if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
-                if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
-                if (e = mult(*ma, *mb, &ms)) != E_OK) return e;
-                FILE *f3 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-            case 'idty' :
-/*                if 
-                FILE *f3 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-*/
-            case 'null' :
-/*                FILE *f3 = fopen(&archS,'w');
-                if (e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-*/          case 'cmp' :
-                FILE *f1 = fopen(&arch1,'r')
-                FILE *f2 = fopen(&archS,'r');
-                if (e = (read_matrix(&f1, *ma)) != E_OK) return e;
-                if (e = (read_matrix(&f2, *mb)) != E_OK) return e;
-                int n = cmp_matrix(*ma, *mb);
-                if (e = (create_and_fill_matrix(1, 1, n, &ms)) != E_OK) return e;     
-                if ( e = (write_matrix(&archS, *ms)) != E_OK) return e;
-                return E_OK;
-            break;
-        default: return E_FORMAT_ERROR;
-        }
+        procesar_funciones(*arch1, *arch2, *archS, *op, scalar);
     } else {
         return E_FORMAT_ERROR;
-    }
-    return E_OK;
+
+}return E_OK;
+
   /*	matrix1, matrix2
     archSalida, operacion
 
@@ -150,13 +203,12 @@ int main(int argc, char *argv[]){
 		si -p operacion  
       case()
 */
-
-
-
 }
 
 
 /*  
+
+
 test.m1
 
 M1

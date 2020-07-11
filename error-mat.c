@@ -20,6 +20,8 @@ int output_error(FILE *fp, error_t e)
     return fprintf(fp, "No implmenetado aun (NOTIMPL)");
   case -E_FILE_ERROR:
     return fprintf(fp, "Error de archivo (FILE)");    
+  case -ERROR_INCOMPATIBLE_MATRICES:
+    return fprintf(fp, "Error de tamaño en matrices (SUM o MULT");
   default:
     return fprintf(fp, "Error desconocido (UNKNOWN)");
     }
