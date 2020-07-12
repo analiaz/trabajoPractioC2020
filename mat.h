@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include "../list/list.h"
 #include "error-mat.h" 
+#include <stdbool.h>
 
 #define N_BUF_LENGTH   2048
 #define C_COMMENT       '#' 
-
 
 #define T_TYPE         double
 #define S_TYPE_FMT     "%lf"
@@ -165,11 +165,21 @@ error_t matrix2list(const matrix_t *ma, t_list *l);
 error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma);
 
 // chequea la cantidad de filas
-error_t check_cant_row(const matrix_t ma, int row);
+error_t check_cant_row(const matrix_t *ma, int row);
 
 //chequea la cantidaa de columna
-error_t check_cant_col(const matrix_t ma, int col);
+error_t check_cant_col(const matrix_t *ma, int col);
 
 // chequea la matriz con el numero de col y row que llegan como parametro
-error_t check_dimetions(const matrix_t ma, int row, int col);
+error_t check_dimetions(const matrix_t *ma, int row, int col);
+
+// chequea que la cantidad de filas que llega sea menor o igual
+bool row_within_limits(const matrix_t *m, unsigned int cant);
+
+// chequea que la cantidad de columnas que llega sea menor o igual
+bool col_within_limits(const matrix_t *m, unsigned int cant);
+
+// chequea que cantidd de filas y cantidad de columnas sean menores o iguales a la matriz m
+bool is_within_limits(const matrix_t *m, unsigned int row, unsigned int col);
+
 #endif /*** mat.h ***/

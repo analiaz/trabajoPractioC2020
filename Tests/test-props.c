@@ -160,7 +160,7 @@ static int test_props(FILE *fp)
   matrix_t  *m1;  
   matrix_t  *maux1, *maux2; 
   double     f;
-  list_t     l;
+  t_list     l;
   FILE       *fpout = stdout;
   error_t    e;
   

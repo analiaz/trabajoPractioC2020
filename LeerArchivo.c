@@ -1,4 +1,4 @@
-include "LeerArchivo.h"
+#include "LeerArchivo.h"
 
 void my_debug(const char *msg, ...) {
 #ifdef MY_DEBUG
