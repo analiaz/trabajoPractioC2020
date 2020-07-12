@@ -49,7 +49,7 @@ void procesar_funciones(char *arch1, char *arch2, char *archS, char *op, int sca
         FILE *f3 = fopen(&archS,'w');
         if (e = (write_matrix(&archS, &ms)) != E_OK) return e;
         return E_OK;
-    } else if (strcmp(op, "idty") == 0){ :
+    } else if (strcmp(op, "idty") == 0){ 
         FILE *f1 = fopen(&arch1, 'r');
         if (e = (read_matrix(&f1, &ma)) != E_OK) return e; 
         if (e = (idty_matrix(get_cols(&ma),&ms)) != E_OK) return e;
@@ -72,7 +72,7 @@ void procesar_funciones(char *arch1, char *arch2, char *archS, char *op, int sca
         if (e = (create_and_fill_matrix(1, 1, n, &ms)) != E_OK) return e;     
         if ( e = (write_matrix(&archS, &ms)) != E_OK) return e;
         return E_OK;
-    } else printf("Se a introducido mal alguna orden porfavor ingrese de nuevo")
+    } else printf("Se a introducido mal alguna orden porfavor ingrese de nuevo");
 }
 
 /*

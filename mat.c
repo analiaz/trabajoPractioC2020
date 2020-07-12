@@ -75,7 +75,7 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
   T_TYPE val = V_NULL;
   for(int i = 0; i <= get_rows(&m), ++i){
     for (int j = 0; j <= get_cols(&m); ++j){
-      get_elem_matrix(i, j, val, *m);
+      get_elem_matrix(i, j, &val, &m);
       fprintf(fp, "%d", val);
     }
     fprintf(fp, "\n");
