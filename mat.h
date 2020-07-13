@@ -2,7 +2,7 @@
 #define MATRIX_MAT_H  1
 
 #include <stdio.h>
-#include "../list/list.h"
+#include "list/list.h"
 #include "error-mat.h" 
 #include <stdbool.h>
 
