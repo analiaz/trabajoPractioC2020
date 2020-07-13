@@ -9,7 +9,7 @@
 
 typedef void (* t_matrix_file_handler_by_type)(FILE *);
 enum matrix_file_handler_type{ m1, m2 };
-const char * matrix_file_handler_codes[] = { "m1", "m2", NULL };
+
 
 typedef struct {
   unsigned long int rows;

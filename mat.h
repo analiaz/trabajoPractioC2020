@@ -182,4 +182,6 @@ bool col_within_limits(const matrix_t *m, unsigned int cant);
 // chequea que cantidd de filas y cantidad de columnas sean menores o iguales a la matriz m
 bool is_within_limits(const matrix_t *m, unsigned int row, unsigned int col);
 
+matrix_t *init_matrix(unsigned int nrows, unsigned int ncols);
+
 #endif /*** mat.h ***/

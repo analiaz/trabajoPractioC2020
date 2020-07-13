@@ -1,5 +1,6 @@
 #include "LeerArchivo.h"
 
+
 void my_debug(const char *msg, ...) {
 #ifdef MY_DEBUG
   va_list ap;
@@ -34,6 +35,7 @@ int matrix_file_handler_is_comment(const char * line) {
 
 int matrix_file_handler_read_header(FILE *f) {
 char buffer[MAX_LENGTH];
+const char * matrix_file_handler_codes[] = { "m1", "m2", NULL };
   while (1) {
     if (matrix_file_handler_read_line(buffer, MAX_LENGTH, f)){
       if (!matrix_file_handler_is_comment(buffer)) {
