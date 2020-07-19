@@ -6,6 +6,7 @@ void list_create(t_list *l){
   *l = NULL;
 }
 
+// ve si el elemento esta en la lista
 short list_find(t_list l, t_data e){
   while(l)
   {

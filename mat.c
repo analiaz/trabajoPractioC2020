@@ -8,7 +8,7 @@ error_t e;
 error_t set_ffmt_matrix(matrix_t *m,matrix_fmt_t  fmt)
 {
   if (!m) return E_ALLOC_ERROR;
-  m->fmt = fmt;
+  m->fmt = fmt; // cargo el formato del archivo
   return E_OK;      
 }
 
@@ -22,7 +22,7 @@ error_t get_ffmt_matrix(matrix_t *m, matrix_fmt_t  *fmt)
 // abria que modularizar
 error_t read_matrix(FILE *fp, matrix_t *m)
 {
-	int auxFormat = matrix_file_handler_read_header(fp);
+	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de lamatriz si es 0 = M1
 	if(!auxFormat){
 		//Esto es un modulo
 		t_matrix_file_handler_dimensions dim = matrix_file_handler_m1_dimensions(fp); 
@@ -32,7 +32,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 		//Termina el modulo
 		char * linea = NULL;
 		//usando el read line de LeerArchivo.h y cargar la matrix en un loop mientras arch != EOF
-		unsigned int row, col = 0;
+		unsigned int row = 0, col = 0; // agrege 0 en row
 		char separador[] = " ";
 		while(!feof(fp)){ //devuelve !=0 si encuentra endoffile sino 0 
 			if (matrix_file_handler_read_line(linea, 0, fp)){ //fgets devuelve lo mismo que lo que asigna a linea,
@@ -41,18 +41,18 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 				//¿hay que chequear que la linea no sea un comentario?
 				//Esto es un modulo
 				char *ptr = strtok(linea, separador);
-				while(ptr != NULL){
+				while(ptr != NULL){ // verificar si row no se pasa
 					printf("'%s'\n", ptr);
 					//ya tenes el valor a guardar en la matris
-					T_TYPE value = atof(ptr); // pasa el string a flotante
+					T_TYPE value = atof(ptr); // "pasa el string a flotante (no me indica)" usar sscanf para tranformar string a flotante
 					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) return e;
 					if (++col == dim.columns){
 						col = 0;
-						if (++row == dim.rows) return E_SIZE_ERROR;
+						if (++row == dim.rows) return E_SIZE_ERROR; // verificar si tengo mas elemntos en rows, 
 					}
 					//guardó el valor en la matris, EN TEORIA, y vuelve a leer
 					ptr = strtok(NULL, separador); //El primer parametro es NULL dado que strtok recuerda el string y donde estaba en el (pareciera)
-				}
+				} // el string con el que trbj es un static en strtok
 				//Termina el modulo
 			}
 		}
@@ -194,15 +194,15 @@ error_t create_and_fill_matrix(unsigned int rows, unsigned int cols, T_TYPE a, m
 unsigned int get_rows(const matrix_t *ma)
 {
   if (ma !=NULL){
-    return ma->rows;
+    return ma->rows-1; //para solventar el recorrido en el for -1
   } else
-    return 0;
+    return 0; //no hay matriz nx1
 }
 
 unsigned int get_cols(const matrix_t *ma)
 {
   if (ma !=NULL)
-    return ma->cols;
+    return ma->cols-1; //para solventar el recorrido en el for -1
   else
     return 0;
 };
@@ -213,7 +213,7 @@ error_t null_matrix(unsigned int n, matrix_t **mc)
 };
 
 
-error_t idty_matrix(unsigned int n, matrix_t **m)
+error_t idty_matrix(unsigned int n, matrix_t **m) // diagonal en 1
 {
   null_matrix(n, m);
   for (int i=0 ; i <=n; i++) {
@@ -234,7 +234,7 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
           for (int k = 0; k < get_rows(mb); ++k) {
             if ((e = (get_elem_matrix(i, k, &valA, ma))) != E_OK) return e;
             if ((e = (get_elem_matrix(k, j, &valB, mb))) != E_OK) return e;
-            sum = sum + (valA * valB);
+            sum = sum + (valA * valB); //sumatoria de multiplicaciones
           }
           if ((e = (set_elem_matrix(i, j, sum, mc)))!= E_OK) return e;
           sum = 0;
@@ -247,7 +247,7 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
 
 error_t set_elem_matrix(unsigned int row, unsigned int col, T_TYPE value, matrix_t **m){
 	if (is_within_limits(*m, row, col)){
-   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value;
+   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value;//1 2 44  2x3 [DA, por lo pronto]
     	return E_OK;
   	} else return E_SIZE_ERROR;        
 }
@@ -391,11 +391,11 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
 }
 
 bool row_within_limits(const matrix_t *m, unsigned int cant){
-	return m->rows <= cant;
+	return m->rows >= cant; // antes m->rows <= cant  controlar
 }
 
 bool col_within_limits(const matrix_t *m, unsigned int cant){
-	return m->cols <= cant;
+	return m->cols >= cant;
 }
 
 bool is_within_limits(const matrix_t *m, unsigned int row, unsigned int col){

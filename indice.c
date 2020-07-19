@@ -279,6 +279,8 @@ mult_scalar​
 ● --calc archivo1 id = archivo_salida
 ○ id​ equivale a ​ ”idty”
 */
+
+// controlar que respeta el formato
 error_t calcular_(char *argv[]){
     char *arch1, *arch2, *ope, *archS;
     double scal;
@@ -332,10 +334,10 @@ int main(int argc, char *argv[]){
         char *arch1, *arch2, *ope, *archS;
         double scal;
 
-        for(int i= 1; i <= argc; ++i){
-            operador = argv[i];  // ahora guarde un comando
+        for(int i= 1; i < argc; ++i){ //exclusivamente menor
+            operador = argv[i];  // ahora guarde un comando, se queda con la direccion del primer caracter
             if (strcmp(operador,"--in1") == 0 || (strcmp(operador,"-1")== 0)){
-                arch1 = argv[++i]; // validar si hay un file
+                arch1 = argv[++i]; // validar si hay un file antes de pasar a procesar funciones
                 matrix_file_handler_from_filename(arch1);
             } else if ((strcmp(operador,"--in2")== 0 || (strcmp(operador,"-2") == 0))){
                 arch2 = argv[++i];
@@ -354,7 +356,7 @@ int main(int argc, char *argv[]){
                 printf("--op|-p (dup|sum|mult_scalar|mult|idty|null|cmp)");
             } else printf("Se a introducido mal algun argumento para mas informacion --help");
         }
-        test(arch1,scal);
+//        test(arch1,scal);
         procesar_funciones(arch1, arch2, archS, ope, scal);
     } else {
         printf("argumentos insuficientes ");
