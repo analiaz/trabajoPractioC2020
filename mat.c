@@ -48,7 +48,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) return e;
 					if (++col == dim.columns){
 						col = 0;
-						if (++row == dim.rows) return E_SIZE_ERROR; // verificar si tengo mas elemntos en rows, 
+						if (++row == dim.rows) return E_READ_ERROR; // verificar si tengo mas elemntos en rows, 
 					}
 					//guardó el valor en la matris, EN TEORIA, y vuelve a leer
 					ptr = strtok(NULL, separador); //El primer parametro es NULL dado que strtok recuerda el string y donde estaba en el (pareciera)
@@ -60,7 +60,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 		return E_OK;
 	}	
 	//Si no es M1 el archivo, en este caso no se hace nada
-	else return -E_NOTIMPL_ERROR;      
+	else return E_NOTIMPL_ERROR;      
 }
 
 error_t write_matrix(FILE *fp, const matrix_t *m)
@@ -73,7 +73,7 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
 			//escribir "valor[i][j] "
   	//escribir EOL
   if (!m) return E_ALLOC_ERROR;
-  fprintf(fp, "M1 \n ## Matriz %d x %d \n ",m->rows, m->cols);
+  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt ,m->rows, m->cols); 
   fprintf(fp, "%d %d \n", m->rows, m->cols );
   T_TYPE val = V_NULL;
   for(int i = 0; i <= get_rows(m); ++i) {
@@ -100,8 +100,7 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
         if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
             if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){}
             else return E_NOTIMPL_ERROR;
-        }
-        return e;
+        } else return e;
       }
     } return E_OK;
   } else return E_ALLOC_ERROR;
@@ -116,11 +115,11 @@ error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
     T_TYPE res_mb = V_NULL;
     T_TYPE res_mc = V_NULL;
     if (!create_and_fill_matrix(get_rows(mb), get_cols(mb), V_NULL, mc)){ 
-      for ( int i = 0; i <= get_rows(ma); ++i){
-        for (int j = 0; j <= get_cols(ma); ++j) {
+      for ( int i = 0; i < get_rows(ma); ++i){
+        for (int j = 0; j < get_cols(ma); ++j) {
           if (!(get_elem_matrix(i, j, &res_ma, ma)) && !(get_elem_matrix(i, j, &res_mb, mb))){
               res_mc = res_ma + res_mb;
-              if ((e = (set_elem_matrix(i, j, res_mc, mc))) != E_OK) return e; else return E_NOTIMPL_ERROR;
+              if ((e = (set_elem_matrix(i, j, res_mc, mc))) != E_OK) return e;
           } else return E_READ_ERROR;
         }
       } return E_OK;
@@ -136,8 +135,8 @@ error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst)
   	T_TYPE res_src = V_NULL;
     T_TYPE res_dst = V_NULL;
 	  T_TYPE res = V_NULL;
-    for (int i = 0; i <= get_rows(m_src); ++i){
-      for (int j = 0; j <= get_cols(m_src); ++j) {
+    for (int i = 0; i < get_rows(m_src); ++i){
+      for (int j = 0; j < get_cols(m_src); ++j) {
         if (!(get_elem_matrix(i, j, &res_src, m_src)) && !(get_elem_matrix(i, j, &res_dst, m_dst))){
      			res = res_src + res_dst;
         	if ((e = (set_elem_matrix(i, j, res, &m_dst))) != E_OK)return e;
@@ -154,8 +153,8 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
   if (!mc) return E_ALLOC_ERROR;
   if (check_dimetions(mb, get_rows(*mc), get_cols(*mc) == E_OK)){
   	T_TYPE res = V_NULL;
-    for (int i = 0 ; i <= get_rows(*mc); ++i){
-      for (int j = 0; j <= get_cols(*mc); ++j) {
+    for (int i = 0 ; i < get_rows(*mc); ++i){
+      for (int j = 0; j < get_cols(*mc); ++j) {
           if ((e=(get_elem_matrix(i, j, &res, mb))) == E_OK){
           	res *= a;
       			if ((e = (set_elem_matrix(i, j, res, mc))) != E_OK) return e;
@@ -170,8 +169,8 @@ error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst)
 {
   if (!m_dst) return E_ALLOC_ERROR;
   T_TYPE res = V_NULL;
-  for (int i = 0 ; i <= get_rows(m_dst); ++i){
-    for (int j = 0; j <= get_cols(m_dst); ++j){
+  for (int i = 0 ; i < get_rows(m_dst); ++i){
+    for (int j = 0; j < get_cols(m_dst); ++j){
       if((e =(get_elem_matrix(i,j, &res, m_dst))) == E_OK){
         res *= a;
         if((e = (set_elem_matrix(i,j, res, &m_dst))) != E_OK) return e;
@@ -216,7 +215,7 @@ error_t null_matrix(unsigned int n, matrix_t **mc)
 error_t idty_matrix(unsigned int n, matrix_t **m) // diagonal en 1
 {
   null_matrix(n, m);
-  for (int i=0 ; i <=n; i++) {
+  for (int i=0 ; i < n; i++) {
   	if (!set_elem_matrix(i,i,1,m)) return E_SIZE_ERROR;
   }
   return E_OK;      
@@ -278,14 +277,14 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 error_t free_matrix(matrix_t **m)
 {
   free(*m);
-  return -E_NOTIMPL_ERROR;      
+  return E_OK;      
 }
 
 error_t clear_matrix(matrix_t *m)
 {
-  if (!m) return E_ALLOC_ERROR;
-  for (int i = 0; i <= m->rows;i++){
-  	for (int j = 0; j <= m->cols;j++){
+  if (!m) return E_ALLOC_ERROR; // extrictamente menor
+  for (int i = 0; i < m->rows;i++){
+  	for (int j = 0; j < m->cols;j++){
     	if ((e= (set_elem_matrix(i, j, V_NULL, &m))) != E_OK) return e;
     }
   }
@@ -352,6 +351,7 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
 	//free(ma->data)
 	//ma->data = &aux
   //TO DO refactorizar init_matrix y usar las nuevas funciones aca
+  if (ma == NULL) return E_ALLOC_ERROR; 
   T_TYPE *aux;
 	aux = malloc(newrows * newcols * sizeof(T_TYPE));
   if (!aux) {
