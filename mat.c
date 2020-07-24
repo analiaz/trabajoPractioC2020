@@ -41,10 +41,13 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 				//¿hay que chequear que la linea no sea un comentario?
 				//Esto es un modulo
 				char *ptr = strtok(linea, separador);
+				T_TYPE value = V_NULL;
 				while(ptr != NULL){ // verificar si row no se pasa
-					printf("'%s'\n", ptr);
+					printf("%s \n", ptr); // Para testear que esta leyendo
 					//ya tenes el valor a guardar en la matris
-					T_TYPE value = atof(ptr); // "pasa el string a flotante (no me indica)" usar sscanf para tranformar string a flotante
+					int retVal = sscanf(ptr, "%lf", value);
+					printf("%lf \n", val); // para testear la correcta convercion
+					//T_TYPE value = atof(ptr); // "pasa el string a flotante (no me indica)" usar sscanf para tranformar string a flotante
 					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) return e;
 					if (++col == dim.columns){
 						col = 0;
@@ -79,7 +82,7 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
   for(int i = 0; i <= get_rows(m); ++i) {
     for (int j = 0; j <= get_cols(m); ++j){
       if ((e = (get_elem_matrix(i, j, &val, m))) != E_OK) return e;
-      fprintf(fp, "%f", val);
+      fprintf(fp, "%f ", val);
     }
     fprintf(fp, "\n");
   }

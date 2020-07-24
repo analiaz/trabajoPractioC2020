@@ -287,22 +287,29 @@ error_t calcular_(char *argv[]){
 
     if (strcmp(argv[3],"+")== 0) {
         ope = "sum";
-        arch1 = argv[2]; 
+        arch1 = argv[2];
+        matrix_file_handler_from_filename(arch1); 
         arch2 = argv[4];
+        matrix_file_handler_from_filename(arch2);
         archS = argv[6];
     } else if (strcmp(argv[3],"*")== 0){
         ope = "mult";
-        arch1 = argv[2]; 
+        arch1 = argv[2];
+        matrix_file_handler_from_filename(arch1);
         arch2 = argv[4];
+        matrix_file_handler_from_filename(arch2);
         archS = argv[6];        
     } else if (strcmp(argv[3],".*") == 0) {
         ope = "mult_scalar";
         arch1 = argv[2];
-        scal = atof(argv[4]); //ascci a doble
+        matrix_file_handler_from_filename(arch1);
+        int ret = sscanf(argv[4], "%lf", scal);
+        //scal = atof(argv[4]); //ascci a doble
         archS = argv[6];       
     } else if (strcmp(argv[3],"id")== 0) {
         ope = "idty_matrix";
         arch1 = argv[2];
+        matrix_file_handler_from_filename(arch1);
         archS = argv[5];
     } else printf("Se a introducido mal alguna orden porfavor ingrese de nuevo");
     
@@ -345,7 +352,8 @@ int main(int argc, char *argv[]){
             } else if ((strcmp(operador,"--out") == 0 || (strcmp(operador,"-o")== 0))){
                 archS = argv[++i];                
             } else if ((strcmp(operador,"--scalar") == 0 || (strcmp(operador,"-s")== 0))){
-                scal = atof(argv[++i]);
+                int ret = sscanf(argv[++i], "%lf", scal);
+                //scal = atof(argv[++i]);
             } else if ((strcmp(operador, "--op") == 0 || (strcmp(operador, "p")== 0))){
                   ope = argv[++i];
             } else if ((strcmp(operador, "--help"))){
