@@ -8,7 +8,7 @@ error_t e;
 error_t set_ffmt_matrix(matrix_t *m,matrix_fmt_t  fmt)
 {
   if (!m) return E_ALLOC_ERROR;
-  m->fmt = fmt; // cargo el formato del archivo
+  m->fmt = fmt;
   return E_OK;      
 }
 
@@ -24,64 +24,59 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 {
 	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de lamatriz si es 0 = M1
 	if(!auxFormat){
-		//Esto es un modulo
+		
 		t_matrix_file_handler_dimensions dim = matrix_file_handler_m1_dimensions(fp); 
 		m = init_matrix(dim.rows, dim.columns);
 		clear_matrix(m);
 		set_ffmt_matrix(m, auxFormat);
-		//Termina el modulo
+		
 		char * linea = NULL;
-		//usando el read line de LeerArchivo.h y cargar la matrix en un loop mientras arch != EOF
-		unsigned int row = 0, col = 0; // agrege 0 en row
+		//uso el read line de LeerArchivo.h y cargo la matrix en un loop mientras arch != EOF
+		unsigned int row = 0, col = 0;
 		char separador[] = " ";
 		while(!feof(fp)){ //devuelve !=0 si encuentra endoffile sino 0 
-			if (matrix_file_handler_read_line(linea, 0, fp)){ //fgets devuelve lo mismo que lo que asigna a linea,
-																					//si hubo un error retorna NULL
+			if (matrix_file_handler_read_line(linea, 0, fp)){ 
+        //fgets devuelve lo mismo que lo que asigna a linea,
+				//si hubo un error retorna NULL
 				//una linea puede traer mas de un valor, se debe separar por " " hasta que se lea un EOL
-				//¿hay que chequear que la linea no sea un comentario?
-				//Esto es un modulo
+
 				char *ptr = strtok(linea, separador);
 				T_TYPE value = V_NULL;
-				while(ptr != NULL){ // verificar si row no se pasa
-					printf("%s \n", ptr); // Para testear que esta leyendo
+				while(ptr != NULL){ 
+					printf("%s \n", ptr); 
 					//ya tenes el valor a guardar en la matris
 					int retVal = sscanf(ptr, "%lf", value);
-					printf("%lf \n", val); // para testear la correcta convercion
-					//T_TYPE value = atof(ptr); // "pasa el string a flotante (no me indica)" usar sscanf para tranformar string a flotante
-					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) return e;
+					printf("%lf \n", value); // testea la correcta convercion
+					
+					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) {fclose(fp); return e; };
 					if (++col == dim.columns){
 						col = 0;
-						if (++row == dim.rows) return E_READ_ERROR; // verificar si tengo mas elemntos en rows, 
+						if (++row == dim.rows) { fclose(fp); return E_READ_ERROR;} // verificar si tengo mas elemntos en rows, 
 					}
-					//guardó el valor en la matris, EN TEORIA, y vuelve a leer
-					ptr = strtok(NULL, separador); //El primer parametro es NULL dado que strtok recuerda el string y donde estaba en el (pareciera)
-				} // el string con el que trbj es un static en strtok
-				//Termina el modulo
+					
+					ptr = strtok(NULL, separador); 
+				} 
 			}
 		}
     fclose(fp);
 		return E_OK;
 	}	
 	//Si no es M1 el archivo, en este caso no se hace nada
-	else return E_NOTIMPL_ERROR;      
+	else { 
+    fclose(fp); 
+    return E_NOTIMPL_ERROR;
+  }      
 }
 
 error_t write_matrix(FILE *fp, const matrix_t *m)
 {
-	//hay que conseguir el formato y escribirlo
-	//escribir "m->rows" x "m->colums"
-	//¿Comentarios?
-	//for i
-		//for j
-			//escribir "valor[i][j] "
-  	//escribir EOL
-  if (!m) return E_ALLOC_ERROR;
+  if (!m) {fclose(fp); return E_ALLOC_ERROR;}
   fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt ,m->rows, m->cols); 
   fprintf(fp, "%d %d \n", m->rows, m->cols );
   T_TYPE val = V_NULL;
-  for(int i = 0; i <= get_rows(m); ++i) {
-    for (int j = 0; j <= get_cols(m); ++j){
-      if ((e = (get_elem_matrix(i, j, &val, m))) != E_OK) return e;
+  for(int i = 0; i < get_rows(m); ++i) {
+    for (int j = 0; j < get_cols(m); ++j){
+      if ((e = (get_elem_matrix(i, j, &val, m))) != E_OK) {fclose(fp); return e;}
       fprintf(fp, "%f ", val);
     }
     fprintf(fp, "\n");
@@ -185,8 +180,8 @@ error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst)
 error_t create_and_fill_matrix(unsigned int rows, unsigned int cols, T_TYPE a, matrix_t **mb)
 {
   *mb = init_matrix(rows, cols);
-  for (int i = 0 ; i <= rows; ++i){
-    for (int j = 0; j <= cols; ++j){
+  for (int i = 0 ; i < rows; ++i){
+    for (int j = 0; j < cols; ++j){
       if ((e = (set_elem_matrix(i,j,a,mb))) != E_OK) return e;
     }
   }
@@ -248,14 +243,16 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
 } 
 
 error_t set_elem_matrix(unsigned int row, unsigned int col, T_TYPE value, matrix_t **m){
-	if (is_within_limits(*m, row, col)){
-   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value;//1 2 44  2x3 [DA, por lo pronto]
+	if (!(*m)) return E_ALLOC_ERROR;
+  if (is_within_limits(*m, row, col)){
+   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value;// explicar mejor
     	return E_OK;
   	} else return E_SIZE_ERROR;        
 }
 
 error_t get_elem_matrix(unsigned int row, unsigned int col, T_TYPE *value, const matrix_t *m)
 {
+  if (!(m)) return E_ALLOC_ERROR;
   if (is_within_limits(m, row, col)){
     *value = m->data[row + (row * (m->cols - 1)) + col];
     return E_OK;
@@ -279,13 +276,14 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 
 error_t free_matrix(matrix_t **m)
 {
+  free((*m)->data); // tendria q ser asi, volver a verificar
   free(*m);
   return E_OK;      
 }
 
 error_t clear_matrix(matrix_t *m)
 {
-  if (!m) return E_ALLOC_ERROR; // extrictamente menor
+  if (!m) return E_ALLOC_ERROR;
   for (int i = 0; i < m->rows;i++){
   	for (int j = 0; j < m->cols;j++){
     	if ((e= (set_elem_matrix(i, j, V_NULL, &m))) != E_OK) return e;
@@ -302,7 +300,7 @@ error_t get_row(unsigned int pos, const matrix_t *ma, t_list *l)
       list_create(l);
     }
     T_TYPE aux = 0;
-    for (int i = 0 ; i <= get_rows(ma); ++i){
+    for (int i = 0 ; i < get_rows(ma); ++i){
       if ((e = (get_elem_matrix(pos, i, &aux, ma))) == E_OK){
       	list_add(l,aux);
       }else return e;
@@ -320,7 +318,7 @@ error_t get_col(unsigned int pos, const matrix_t *ma, t_list *l)
       list_create(l);
     }
     T_TYPE aux = 0;
-    for (int i = 0 ; i <= get_cols(ma); ++i){
+    for (int i = 0 ; i < get_cols(ma); ++i){
       if ((e = (get_elem_matrix(i, pos, &aux, ma))) == E_OK){
       	list_add(l,aux);
       } else return e;
@@ -348,12 +346,8 @@ error_t matrix2list(const matrix_t *ma, t_list *l)
 
 error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
 {
-  // crear un T_TYPE* aux
-	// asignar espacio a aux de newrows * newcols
-	//copiar los valodres de ma->data en aux
-	//free(ma->data)
-	//ma->data = &aux
-  //TO DO refactorizar init_matrix y usar las nuevas funciones aca
+  // hacerlo lindo con realloc
+  if (!(*ma)) return E_ALLOC_ERROR;
   if (ma == NULL) return E_ALLOC_ERROR; 
   T_TYPE *aux;
 	aux = malloc(newrows * newcols * sizeof(T_TYPE));
@@ -394,15 +388,18 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
 }
 
 bool row_within_limits(const matrix_t *m, unsigned int cant){
-	return m->rows >= cant; // antes m->rows <= cant  controlar
+  if (!m) return E_ALLOC_ERROR;
+	return m->rows >= cant; 
 }
 
 bool col_within_limits(const matrix_t *m, unsigned int cant){
-	return m->cols >= cant;
+	if (!m) return E_ALLOC_ERROR;
+  return m->cols >= cant;
 }
 
 bool is_within_limits(const matrix_t *m, unsigned int row, unsigned int col){
-	return row_within_limits(m, row) && col_within_limits(m, col);
+	if (!m) return E_ALLOC_ERROR;
+  return row_within_limits(m, row) && col_within_limits(m, col);
 }
 
 error_t check_cant_row(const matrix_t *ma, int row){

@@ -197,8 +197,6 @@ static int test (char *fp, double SCALAR){
     }
 }
 
-
-
 error_t procesar_funciones(char *arch1, char *arch2, char *archS, char *op, T_TYPE scalar){
     matrix_t *ma = NULL, *mb = NULL, *ms = NULL;
     error_t e;
@@ -304,7 +302,6 @@ error_t calcular_(char *argv[]){
         arch1 = argv[2];
         matrix_file_handler_from_filename(arch1);
         int ret = sscanf(argv[4], "%lf", scal);
-        //scal = atof(argv[4]); //ascci a doble
         archS = argv[6];       
     } else if (strcmp(argv[3],"id")== 0) {
         ope = "idty_matrix";
@@ -341,10 +338,10 @@ int main(int argc, char *argv[]){
         char *arch1, *arch2, *ope, *archS;
         double scal;
 
-        for(int i= 1; i < argc; ++i){ //exclusivamente menor
+        for(int i= 1; i < argc; ++i){
             operador = argv[i];  // ahora guarde un comando, se queda con la direccion del primer caracter
             if (strcmp(operador,"--in1") == 0 || (strcmp(operador,"-1")== 0)){
-                arch1 = argv[++i]; // validar si hay un file antes de pasar a procesar funciones
+                arch1 = argv[++i]; // valida si hay un file antes de pasar a procesar funciones
                 matrix_file_handler_from_filename(arch1);
             } else if ((strcmp(operador,"--in2")== 0 || (strcmp(operador,"-2") == 0))){
                 arch2 = argv[++i];
@@ -353,7 +350,6 @@ int main(int argc, char *argv[]){
                 archS = argv[++i];                
             } else if ((strcmp(operador,"--scalar") == 0 || (strcmp(operador,"-s")== 0))){
                 int ret = sscanf(argv[++i], "%lf", scal);
-                //scal = atof(argv[++i]);
             } else if ((strcmp(operador, "--op") == 0 || (strcmp(operador, "p")== 0))){
                   ope = argv[++i];
             } else if ((strcmp(operador, "--help"))){
