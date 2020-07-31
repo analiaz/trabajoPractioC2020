@@ -5,6 +5,7 @@
 
 error_t e;
 
+// Asigna el formato a la matriz
 error_t set_ffmt_matrix(matrix_t *m,matrix_fmt_t  fmt)
 {
   if (!m) return E_ALLOC_ERROR;
@@ -12,6 +13,7 @@ error_t set_ffmt_matrix(matrix_t *m,matrix_fmt_t  fmt)
   return E_OK;      
 }
 
+// Devuelve el formato de la matriz
 error_t get_ffmt_matrix(matrix_t *m, matrix_fmt_t  *fmt)
 {
   if (!m) return E_ALLOC_ERROR;
@@ -19,49 +21,53 @@ error_t get_ffmt_matrix(matrix_t *m, matrix_fmt_t  *fmt)
   return E_OK;      
 }
 
-// abria que modularizar
+
 error_t read_matrix(FILE *fp, matrix_t *m)
 {
-	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de lamatriz si es 0 = M1
-	if(!auxFormat){
+	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de la matriz (si es 0 = formato M1)
+	
+  if(!auxFormat){ // Si el formato es M1
 		
-		t_matrix_file_handler_dimensions dim = matrix_file_handler_m1_dimensions(fp); 
-		m = init_matrix(dim.rows, dim.columns);
-		clear_matrix(m);
-		set_ffmt_matrix(m, auxFormat);
+		t_matrix_file_handler_dimensions dim = matrix_file_handler_m1_dimensions(fp); // asigno dimesion (fila, columna) de la matriz leido desde el archivo
+		m = init_matrix(dim.rows, dim.columns); 
+		clear_matrix(m); // lo inicializo en 0
+		set_ffmt_matrix(m, auxFormat); 
 		
-		char * linea = NULL;
-		//uso el read line de LeerArchivo.h y cargo la matrix en un loop mientras arch != EOF
-		unsigned int row = 0, col = 0;
-		char separador[] = " ";
-		while(!feof(fp)){ //devuelve !=0 si encuentra endoffile sino 0 
+    
+    char * linea = NULL; // guarda para leer del archivo
+		unsigned int row = 0, col = 0; // mantener una guia de en que posicion se guarda cada elemento que se leedl archivo
+		char separador[] = " "; // contiene los caracteres que se utilizan como separadores de los valores que vienen en el archivo en este caso solamente "un espacio en blanco"
+		
+    //se usa matrix_file_handler_read_line (de LeerArchivo.h), se carga la matrix en un loop mientras archivo != EOF (que contenga algo) entra
+    while(!feof(fp)){ 
 			if (matrix_file_handler_read_line(linea, 0, fp)){ 
-        //fgets devuelve lo mismo que lo que asigna a linea,
-				//si hubo un error retorna NULL
-				//una linea puede traer mas de un valor, se debe separar por " " hasta que se lea un EOL
+        //dentro de la funcion se encuentra fgets que devuelve lo leido del archivo, un valor asignado en linea,si hubo un error retorna NULL
+				//una linea puede traer mas de un valor, entonces se separa por "separador" hasta que se lea un EOL
 
-				char *ptr = strtok(linea, separador);
-				T_TYPE value = V_NULL;
+				char *ptr = strtok(linea, separador); // lee linea hasta encontrar separador, retornando lo que leyo y dejando en linea el resto de la cadena 
+				T_TYPE value = V_NULL; // se quedara con el valos de sscanf
+
 				while(ptr != NULL){ 
 					printf("%s \n", ptr); 
-					//ya tenes el valor a guardar en la matris
-					int retVal = sscanf(ptr, "%lf", value);
+					int retVal = sscanf(ptr, "%lf", &value); // se convierte el valor leido a flotante 
 					printf("%lf \n", value); // testea la correcta convercion
 					
-					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) {fclose(fp); return e; };
-					if (++col == dim.columns){
+
+					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) {fclose(fp); return e; }; // se intenta agregar elelemento a la matriz
+					
+          if (++col == dim.columns){ // chequea si llego al final de la fila y por consiguiente si tiene que cambiar
 						col = 0;
-						if (++row == dim.rows) { fclose(fp); return E_READ_ERROR;} // verificar si tengo mas elemntos en rows, 
+						if (++row == dim.rows) { fclose(fp); return E_READ_ERROR;} // verifica que no se vaya de rango en las filas 
 					}
 					
-					ptr = strtok(NULL, separador); 
+					ptr = strtok(NULL, separador); // se lee otra parte de la linea hasta encontrar el separador, siendo el primer parametro null para tomar desde el punto que dejo en la vez anterior
 				} 
 			}
 		}
-    fclose(fp);
+    fclose(fp); 
 		return E_OK;
 	}	
-	//Si no es M1 el archivo, en este caso no se hace nada
+	//Si no es M1 el archivo solo se cierra el archivo y se devuelve el error de no implementacion
 	else { 
     fclose(fp); 
     return E_NOTIMPL_ERROR;
@@ -70,10 +76,13 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 
 error_t write_matrix(FILE *fp, const matrix_t *m)
 {
-  if (!m) {fclose(fp); return E_ALLOC_ERROR;}
-  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt ,m->rows, m->cols); 
-  fprintf(fp, "%d %d \n", m->rows, m->cols );
+  if (!m) {fclose(fp); return E_ALLOC_ERROR;} // se verifica que exista m
+
+  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt ,m->rows, m->cols); // se imprime la cabecera del archivo (formato y dimenciones)
+  fprintf(fp, "%d %d \n", m->rows, m->cols ); //se imprime filas y columnas
   T_TYPE val = V_NULL;
+
+  // se recorre lamatriz para ir copiando esta en el archivo
   for(int i = 0; i < get_rows(m); ++i) {
     for (int j = 0; j < get_cols(m); ++j){
       if ((e = (get_elem_matrix(i, j, &val, m))) != E_OK) {fclose(fp); return e;}
@@ -89,12 +98,14 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
 
 error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
 {
-  if (!m_src) return E_ALLOC_ERROR;
-  if (create_and_fill_matrix(get_rows(m_src), get_cols(m_src), V_NULL, m_dst)){
+  if (!m_src) return E_ALLOC_ERROR; // se verifica que exista m_src
+
+  if (create_and_fill_matrix(get_rows(m_src), get_cols(m_src), V_NULL, m_dst)){ // se crea la matriz de destino con la fila y columna de la matriz de inicio m_src
+    
     T_TYPE res = V_NULL;
-    error_t e;
-    for (int i = 0; i <= get_rows(m_src); ++i){
-      for (int j = 0; j <= get_cols(m_src); ++j){
+    //recorro la matriz de entrada m_src y cargo en m_dst
+    for (int i = 0; i < get_rows(m_src); ++i){
+      for (int j = 0; j < get_cols(m_src); ++j){
         if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
             if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){}
             else return E_NOTIMPL_ERROR;
@@ -106,18 +117,24 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
 
 error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
 {
+  // se verific que las matrices existan
   if (!mb) return E_ALLOC_ERROR;
   if (!ma) return E_ALLOC_ERROR;
+
+  // para realizar la suma de matrices las dimenciones deben ser iguales
   if (check_dimetions(ma, get_rows(mb), get_cols(mb))){
-  	T_TYPE res_ma = V_NULL;
-    T_TYPE res_mb = V_NULL;
+  	// creo variable de contenido para llevar la suma
+    T_TYPE val_ma = V_NULL;
+    T_TYPE val_mb = V_NULL;
     T_TYPE res_mc = V_NULL;
-    if (!create_and_fill_matrix(get_rows(mb), get_cols(mb), V_NULL, mc)){ 
+    
+    if (!create_and_fill_matrix(get_rows(mb), get_cols(mb), V_NULL, mc)){ // utilizo los valores de fila y columna de mb(podria haber elegido  ma) para crear mc
+      // recorro ambas matrices (ma y mb) obtengo sus valores, los sumo y guardo en res_mc 
       for ( int i = 0; i < get_rows(ma); ++i){
         for (int j = 0; j < get_cols(ma); ++j) {
-          if (!(get_elem_matrix(i, j, &res_ma, ma)) && !(get_elem_matrix(i, j, &res_mb, mb))){
-              res_mc = res_ma + res_mb;
-              if ((e = (set_elem_matrix(i, j, res_mc, mc))) != E_OK) return e;
+          if (!(get_elem_matrix(i, j, &val_ma, ma)) && !(get_elem_matrix(i, j, &val_mb, mb))){
+              res_mc = val_ma + val_mb;
+              if ((e = (set_elem_matrix(i, j, res_mc, mc))) != E_OK) return e; // se verifica que se haya seteado bien mc
           } else return E_READ_ERROR;
         }
       } return E_OK;
@@ -125,14 +142,18 @@ error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
   } else return ERROR_INCOMPATIBLE_MATRICES;
 }     
 
-error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst)
+error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst) // idem sum con la diferencia de que no existe una matriz resultado y lo qu se hace es pisar los valores en m_dst
 {
+  
   if (!m_src) return E_ALLOC_ERROR;
   if (!m_dst) return E_ALLOC_ERROR;
+
   if (check_dimetions(m_src, get_rows(m_dst), get_cols(m_dst) == E_OK)){
-  	T_TYPE res_src = V_NULL;
+  	
+    T_TYPE res_src = V_NULL;
     T_TYPE res_dst = V_NULL;
 	  T_TYPE res = V_NULL;
+    
     for (int i = 0; i < get_rows(m_src); ++i){
       for (int j = 0; j < get_cols(m_src); ++j) {
         if (!(get_elem_matrix(i, j, &res_src, m_src)) && !(get_elem_matrix(i, j, &res_dst, m_dst))){
@@ -147,10 +168,15 @@ error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst)
 
 error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
 {
+  // se verifica que existan las matrices
   if (!mb) return E_ALLOC_ERROR;
   if (!mc) return E_ALLOC_ERROR;
-  if (check_dimetions(mb, get_rows(*mc), get_cols(*mc) == E_OK)){
-  	T_TYPE res = V_NULL;
+
+  // en la multiplicacion escalar las columnas de mb y mc tiene que ser iguales
+  if (check_dimetions(mb, get_rows(*mc), get_cols(*mc) == E_OK)){ 
+  	
+    T_TYPE res = V_NULL;
+    // recorro las matrices y multiplico por el escalar guardando en mc
     for (int i = 0 ; i < get_rows(*mc); ++i){
       for (int j = 0; j < get_cols(*mc); ++j) {
           if ((e=(get_elem_matrix(i, j, &res, mb))) == E_OK){
@@ -163,10 +189,12 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
   } else return ERROR_INCOMPATIBLE_MATRICES;      
 }
 
-error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst)
+error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst) // idem mult_scalar pero se aplica la multiplicacion a una sola matriz
 {
   if (!m_dst) return E_ALLOC_ERROR;
+
   T_TYPE res = V_NULL;
+  
   for (int i = 0 ; i < get_rows(m_dst); ++i){
     for (int j = 0; j < get_cols(m_dst); ++j){
       if((e =(get_elem_matrix(i,j, &res, m_dst))) == E_OK){
