@@ -380,17 +380,22 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
   T_TYPE *aux;
 	aux = malloc(newrows * newcols * sizeof(T_TYPE));
   if (!aux) {
-    exit(E_ALLOC_ERROR);
+    return E_ALLOC_ERROR;
   };
   T_TYPE val = V_NULL;
+  int pos;
   for (int i = 0; i <= newrows; ++i ){
     for (int j = 0; i <= newcols; j++){
-      if ((e = (get_elem_matrix(i, j, &val, *ma))) == E_OK){
-        aux[newrows + newrows * ((*ma)->cols - 1) + newcols] = val;
-      } else return e; 
+    	pos = newrows + newrows * (newcols - 1) + newcols;
+      	if ((e = (get_elem_matrix(i, j, &val, *ma))) == E_OK){
+        	aux[pos] = val;
+        	free((*ma)->data[pos]); //Libera la memoria ocupada por el elemento almacenado en data
+      	} else {
+      		aux[pos] = 0.0;
+      	} 
     }
   }
-  (*ma)->data = aux; //ignoro completamente el hecho de que queda memoria no liberada
+  (*ma)->data = aux;
   (*ma)->cols = newcols;
   (*ma)->rows = newrows;
 
