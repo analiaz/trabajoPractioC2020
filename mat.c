@@ -377,24 +377,36 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
   // hacerlo lindo con realloc
   if (!(*ma)) return E_ALLOC_ERROR;
   if (ma == NULL) return E_ALLOC_ERROR; 
-  T_TYPE *aux;
+  T_TYPE *aux = NULL; //realloc((*ma)->data, newrows * newcols * sizeof(T_TYPE); La informacion de la matris seria incorrecta si se usa realloc()
+                                                                                          //solo funcionaria si se desea, solamente, agregar o retirar filas
 	aux = malloc(newrows * newcols * sizeof(T_TYPE));
   if (!aux) {
     return E_ALLOC_ERROR;
   };
   T_TYPE val = V_NULL;
   int pos;
-  for (int i = 0; i <= newrows; ++i ){
-    for (int j = 0; i <= newcols; j++){
+  /**
+  int filas = (*ma)->rows;
+  //Checkea si debe completar nuevos valores
+  if (newrows > filas)
+  {
+    int filasVacias =  newrows - filas;
+
+  }
+  **/
+
+  for (int i = 0; i < newrows; ++i ){
+    for (int j = 0; i < newcols; ++j){
     	pos = newrows + newrows * (newcols - 1) + newcols;
       	if ((e = (get_elem_matrix(i, j, &val, *ma))) == E_OK){
         	aux[pos] = val;
-        	free((*ma)->data[pos]); //Libera la memoria ocupada por el elemento almacenado en data
+        	free((*ma)->data + (sizeof(T_TYPE) * pos)); //Libera la memoria ocupada por el elemento almacenado en data
       	} else {
-      		aux[pos] = 0.0;
+      		aux[pos] = V_NULL;
       	} 
     }
   }
+
   (*ma)->data = aux;
   (*ma)->cols = newcols;
   (*ma)->rows = newrows;
