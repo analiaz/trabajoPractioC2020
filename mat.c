@@ -207,10 +207,10 @@ error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst) // idem mult_scalar pero 
 
 error_t create_and_fill_matrix(unsigned int rows, unsigned int cols, T_TYPE a, matrix_t **mb)
 {
-  *mb = init_matrix(rows, cols);
+  *mb = init_matrix(rows, cols); 
   for (int i = 0 ; i < rows; ++i){
     for (int j = 0; j < cols; ++j){
-      if ((e = (set_elem_matrix(i,j,a,mb))) != E_OK) return e;
+      if ((e = (set_elem_matrix(i,j,a,mb))) != E_OK) return e; 
     }
   }
   return E_OK;      
@@ -219,7 +219,7 @@ error_t create_and_fill_matrix(unsigned int rows, unsigned int cols, T_TYPE a, m
 unsigned int get_rows(const matrix_t *ma)
 {
   if (ma !=NULL){
-    return ma->rows-1; //para solventar el recorrido en el for -1
+    return ma->rows-1; //para solventar el recorrido en el for -1, Revisar con un test
   } else
     return 0; //no hay matriz nx1
 }
@@ -227,7 +227,7 @@ unsigned int get_rows(const matrix_t *ma)
 unsigned int get_cols(const matrix_t *ma)
 {
   if (ma !=NULL)
-    return ma->cols-1; //para solventar el recorrido en el for -1
+    return ma->cols-1; //para solventar el recorrido en el for -1, Revisar con un test
   else
     return 0;
 };
@@ -252,9 +252,9 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
   if (!ma) return E_ALLOC_ERROR;
   if (!mb) return E_ALLOC_ERROR;
   if (check_dimetions(ma, get_rows(mb), get_cols(mb) == E_OK)){
-  	if (!create_and_fill_matrix(get_rows(ma), get_cols(mb), V_NULL, mc)) {  
-		T_TYPE valA, valB, sum = 0;
-     	for (int i = 0; i < get_rows(ma); ++i) {
+  	if (e = (create_and_fill_matrix(get_rows(ma), get_cols(mb), V_NULL, mc)) == E_OK) {  
+	  	T_TYPE valA, valB, sum = 0;
+     	for (int i = 0; i < get_rows(ma); ++i) { 
         for (int j = 0; j < get_cols(mb); ++j) {
           for (int k = 0; k < get_rows(mb); ++k) {
             if ((e = (get_elem_matrix(i, k, &valA, ma))) != E_OK) return e;
@@ -273,7 +273,7 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
 error_t set_elem_matrix(unsigned int row, unsigned int col, T_TYPE value, matrix_t **m){
 	if (!(*m)) return E_ALLOC_ERROR;
   if (is_within_limits(*m, row, col)){
-   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value;// explicar mejor
+   		(*m)->data[row + row * ((*m)->cols - 1) + col] = value; //acceso directo a la posicion donde se debe almacenar el valor
     	return E_OK;
   	} else return E_SIZE_ERROR;        
 }
@@ -282,7 +282,7 @@ error_t get_elem_matrix(unsigned int row, unsigned int col, T_TYPE *value, const
 {
   if (!(m)) return E_ALLOC_ERROR;
   if (is_within_limits(m, row, col)){
-    *value = m->data[row + (row * (m->cols - 1)) + col];
+    *value = m->data[row + (row * (m->cols - 1)) + col];// devuelvo el valor almacenado haciendo un accceso directo
     return E_OK;
   }else {
   return E_SIZE_ERROR;      
@@ -292,8 +292,8 @@ error_t get_elem_matrix(unsigned int row, unsigned int col, T_TYPE *value, const
 int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 {
   if ( check_dimetions(ma, get_rows(mb), get_cols(mb))){
-    for(int i=0;i<(mb->rows)*(mb->cols);i++){
-     	if (mb->data[i] - ma->data[i] >=  V_DELTA_PRECS){
+    for(int i=0;i<(mb->rows)*(mb->cols);i++){ // como mi matriz esta alamcenada de manera que es un arreglo unidimencional, multiplico para obtener el largo exacto 
+     	if (mb->data[i] - ma->data[i] >=  V_DELTA_PRECS){ // como lo de adentro es una flotante busco tener un acercamiento a 0 con V_DELTA_PRECS
         	return 0; //false 
         }
     }
@@ -304,8 +304,13 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 
 error_t free_matrix(matrix_t **m)
 {
-  free((*m)->data); // tendria q ser asi, volver a verificar
+  for (int i = 0; i < get_rows(*m); ++i){
+    for (int j =0; j < get_cols(*m); ++j){
+     	free((*m)->data + (sizeof(T_TYPE) * ( i + i * (j-1) + j))); //Libera la memoria ocupada por el elemento almacenado en data 
+    }
+  }
   free(*m);
+  
   return E_OK;      
 }
 
@@ -323,12 +328,12 @@ error_t clear_matrix(matrix_t *m)
 error_t get_row(unsigned int pos, const matrix_t *ma, t_list *l)
 {
   if (!ma) return E_ALLOC_ERROR;
-  if (row_within_limits(ma, pos)) {
-    if (list_is_empty(*l)){
+  if (row_within_limits(ma, pos)) { // se chequea que al menos exista la fila pos
+    if (list_is_empty(*l)){  
       list_create(l);
     }
     T_TYPE aux = 0;
-    for (int i = 0 ; i < get_rows(ma); ++i){
+    for (int i = 0 ; i < get_rows(ma); ++i){ 
       if ((e = (get_elem_matrix(pos, i, &aux, ma))) == E_OK){
       	list_add(l,aux);
       }else return e;
@@ -356,20 +361,21 @@ error_t get_col(unsigned int pos, const matrix_t *ma, t_list *l)
   return E_SIZE_ERROR;      
 }
 
-error_t matrix2list(const matrix_t *ma, t_list *l)
+error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la matriz
 {
   if (!ma) return E_ALLOC_ERROR;
   list_create(l);
-  T_TYPE aux;
-  for (int i=0; i <= get_rows(ma); ++i){
-    for (int j= 0; j <= get_cols(ma); j++){
-      if ((e = (get_elem_matrix(i, j, &aux, ma))) == E_OK){
-        list_add(l,aux);
-      } else return e;
+  if (l) {
+    T_TYPE aux;
+    for (int i = 0; i < get_rows(ma); ++i){
+      for (int j = 0; j < get_cols(ma); j++){
+        if ((e = (get_elem_matrix(i, j, &aux, ma))) == E_OK){
+          list_add(l,aux);
+        } else return e;
+      }
     }
   }
   return E_OK;
-
 }
 
 error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
@@ -377,9 +383,9 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
   // hacerlo lindo con realloc
   if (!(*ma)) return E_ALLOC_ERROR;
   if (ma == NULL) return E_ALLOC_ERROR; 
-  T_TYPE *aux = NULL; //realloc((*ma)->data, newrows * newcols * sizeof(T_TYPE); La informacion de la matris seria incorrecta si se usa realloc()
-                                                                                          //solo funcionaria si se desea, solamente, agregar o retirar filas
-	aux = malloc(newrows * newcols * sizeof(T_TYPE));
+  T_TYPE *aux = NULL; //realloc((*ma)->data, newrows * newcols * sizeof(T_TYPE); La informacion de la matris seria incorrecta si se usa realloc() [porque mi matriz esta tomado como un arreglo]
+                    //solo funcionaria si se desea, solamente, agregar o retirar filas 
+	aux = malloc(newrows * newcols * sizeof(T_TYPE)); // aloco memoria para una nueva matriz de newcol x newrow
   if (!aux) {
     return E_ALLOC_ERROR;
   };
@@ -391,13 +397,11 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
   if (newrows > filas)
   {
     int filasVacias =  newrows - filas;
-
   }
   **/
-
   for (int i = 0; i < newrows; ++i ){
     for (int j = 0; i < newcols; ++j){
-    	pos = newrows + newrows * (newcols - 1) + newcols;
+    	pos = i + i * (j - 1) + j; 
       	if ((e = (get_elem_matrix(i, j, &val, *ma))) == E_OK){
         	aux[pos] = val;
         	free((*ma)->data + (sizeof(T_TYPE) * pos)); //Libera la memoria ocupada por el elemento almacenado en data
@@ -419,13 +423,19 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
   matrix_t *m = NULL;
   m = malloc(sizeof(matrix_t));
   if (!m) {
-    exit(E_ALLOC_ERROR);
-  };
+   // exit(E_ALLOC_ERROR);
+   output_error(NULL, E_ALLOC_ERROR);
+   return NULL;
+  }
+
   m->data = NULL;
   m->data = malloc(nrows * ncols * sizeof(T_TYPE));
   if (!m->data) {
-    exit(E_ALLOC_ERROR);
-  };
+    // exit(E_ALLOC_ERROR);
+    output_error(NULL, E_ALLOC_ERROR);
+    return NULL;
+  }
+  
   m->rows = nrows;
   m->cols = ncols;
 
