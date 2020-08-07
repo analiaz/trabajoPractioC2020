@@ -2,7 +2,7 @@
 #define MATRIX_MAT_H  1
 
 #include <stdio.h>
-#include "list/list.h"
+/*#include "list/list.h" */
 #include "error-mat.h" 
 #include <stdbool.h>
 
@@ -17,6 +17,8 @@
 #define V_DELTA_PRECS  0.00001
 
 typedef enum matrix_fmt {M1 , M2 , INVALID} matrix_fmt_t;
+
+typedef struct t_list{};
 
 typedef struct matrix {
             matrix_fmt_t    fmt;

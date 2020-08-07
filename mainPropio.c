@@ -1,7 +1,7 @@
 //Main realizado para testear la libreria mat.h como parte de la practica de...
 
 #include <stdio.h>
-#include "list/list.h"
+/*#include "list/list.h"*/
 #include "mat.h"
 #include <stdlib.h>
 #include <string.h>

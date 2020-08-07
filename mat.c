@@ -326,7 +326,7 @@ error_t clear_matrix(matrix_t *m)
 }
   
 error_t get_row(unsigned int pos, const matrix_t *ma, t_list *l)
-{
+{/*
   if (!ma) return E_ALLOC_ERROR;
   if (row_within_limits(ma, pos)) { // se chequea que al menos exista la fila pos
     if (list_is_empty(*l)){  
@@ -340,11 +340,11 @@ error_t get_row(unsigned int pos, const matrix_t *ma, t_list *l)
     }
     return E_OK;
   }
-  return E_SIZE_ERROR;      
+  return E_SIZE_ERROR;   */   
 }
 
 error_t get_col(unsigned int pos, const matrix_t *ma, t_list *l)
-{
+{/*
   if (!ma) return E_ALLOC_ERROR;
   if (col_within_limits(ma, pos)) {
     if (list_is_empty(*l)){
@@ -358,11 +358,11 @@ error_t get_col(unsigned int pos, const matrix_t *ma, t_list *l)
     }
     return E_OK;
   }
-  return E_SIZE_ERROR;      
+  return E_SIZE_ERROR;  */    
 }
 
 error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la matriz
-{
+{/*
   if (!ma) return E_ALLOC_ERROR;
   list_create(l);
   if (l) {
@@ -375,7 +375,7 @@ error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la
       }
     }
   }
-  return E_OK;
+  return E_OK; */
 }
 
 error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
