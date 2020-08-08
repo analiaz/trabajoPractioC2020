@@ -23,11 +23,27 @@ void imprimir_Mat(matrix_t* m){
 
 int main(int argc, char *argv[]){
     
-    char* arch1 = "../Test/Test1.m";
+    char* arch1 = "Test/Test1.m";
     matrix_t* matrisTest = NULL;
+    matrix_t* matrisTest2 = NULL;
+    matrix_t* res = NULL;
+
 
     FILE* f = fopen(arch1, "r");
-    if((err = read_matrix(f, matrisTest)) == E_OK)	imprimir_Mat(matrisTest);
+    if (f == NULL) {
+         printf("No se pudo leer el archivo \n"); // error de que no se puede leer el archivo
+    }
+    if((err = create_and_fill_matrix(2, 2, 3.5, &matrisTest)) == E_OK)	imprimir_Mat(matrisTest);
     else printf("No se pudo leer la matris o el archivo \n");
+
+    if((err = create_and_fill_matrix(2, 2, 3.5, &matrisTest2)) == E_OK)	imprimir_Mat(matrisTest);
+
+    if (cmp_matrix(matrisTest, matrisTest2)) printf("Las matrices son iguales");
+    else printf("las matrices son distintas");
+
+    if ((err = sum(matrisTest,matrisTest2,&res))== E_OK) imprimir_Mat(res);
+    else {
+        printf("la suma no funciono, %d", err);
+    }
     return 0;
 }

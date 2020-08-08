@@ -34,7 +34,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 		set_ffmt_matrix(m, auxFormat); 
 		
     
-    char * linea = NULL; // guarda para leer del archivo
+    char * linea = " "; // guarda para leer del archivo
 		unsigned int row = 0, col = 0; // mantener una guia de en que posicion se guarda cada elemento que se leedl archivo
 		char separador[] = " "; // contiene los caracteres que se utilizan como separadores de los valores que vienen en el archivo en este caso solamente "un espacio en blanco"
 		
@@ -130,8 +130,8 @@ error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
     
     if (!create_and_fill_matrix(get_rows(mb), get_cols(mb), V_NULL, mc)){ // utilizo los valores de fila y columna de mb(podria haber elegido  ma) para crear mc
       // recorro ambas matrices (ma y mb) obtengo sus valores, los sumo y guardo en res_mc 
-      for ( int i = 0; i < get_rows(ma); ++i){
-        for (int j = 0; j < get_cols(ma); ++j) {
+      for ( int i = 0; i <= get_rows(ma); ++i){
+        for (int j = 0; j <= get_cols(ma); ++j) {
           if (!(get_elem_matrix(i, j, &val_ma, ma)) && !(get_elem_matrix(i, j, &val_mb, mb))){
               res_mc = val_ma + val_mb;
               if ((e = (set_elem_matrix(i, j, res_mc, mc))) != E_OK) return e; // se verifica que se haya seteado bien mc
