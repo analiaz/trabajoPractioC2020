@@ -83,8 +83,8 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
   T_TYPE val = V_NULL;
 
   // se recorre lamatriz para ir copiando esta en el archivo
-  for(int i = 0; i < get_rows(m); ++i) {
-    for (int j = 0; j < get_cols(m); ++j){
+  for(int i = 0; i <= get_rows(m); ++i) {
+    for (int j = 0; j <= get_cols(m); ++j){
       if ((e = (get_elem_matrix(i, j, &val, m))) != E_OK) {fclose(fp); return e;}
       fprintf(fp, "%f ", val);
     }
@@ -100,12 +100,12 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
 {
   if (!m_src) return E_ALLOC_ERROR; // se verifica que exista m_src
 
-  if (create_and_fill_matrix(get_rows(m_src), get_cols(m_src), V_NULL, m_dst)){ // se crea la matriz de destino con la fila y columna de la matriz de inicio m_src
+  if (create_and_fill_matrix(get_rows(m_src) + 1, get_cols(m_src) + 1, V_NULL, m_dst)){ // se crea la matriz de destino con la fila y columna de la matriz de inicio m_src
     
     T_TYPE res = V_NULL;
     //recorro la matriz de entrada m_src y cargo en m_dst
-    for (int i = 0; i < get_rows(m_src); ++i){
-      for (int j = 0; j < get_cols(m_src); ++j){
+    for (int i = 0; i <= get_rows(m_src); ++i){
+      for (int j = 0; j <= get_cols(m_src); ++j){
         if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
             if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){}
             else return E_NOTIMPL_ERROR;
@@ -128,7 +128,7 @@ error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
     T_TYPE val_mb = V_NULL;
     T_TYPE res_mc = V_NULL;
     
-    if (!create_and_fill_matrix(get_rows(mb), get_cols(mb), V_NULL, mc)){ // utilizo los valores de fila y columna de mb(podria haber elegido  ma) para crear mc
+    if (!create_and_fill_matrix(get_rows(mb) + 1, get_cols(mb) + 1, V_NULL, mc)){ // utilizo los valores de fila y columna de mb(podria haber elegido  ma) para crear mc
       // recorro ambas matrices (ma y mb) obtengo sus valores, los sumo y guardo en res_mc 
       for ( int i = 0; i <= get_rows(ma); ++i){
         for (int j = 0; j <= get_cols(ma); ++j) {
@@ -154,8 +154,8 @@ error_t sum_inplace(const matrix_t *m_src, matrix_t *m_dst) // idem sum con la d
     T_TYPE res_dst = V_NULL;
 	  T_TYPE res = V_NULL;
     
-    for (int i = 0; i < get_rows(m_src); ++i){
-      for (int j = 0; j < get_cols(m_src); ++j) {
+    for (int i = 0; i <= get_rows(m_src); ++i){
+      for (int j = 0; j <= get_cols(m_src); ++j) {
         if (!(get_elem_matrix(i, j, &res_src, m_src)) && !(get_elem_matrix(i, j, &res_dst, m_dst))){
      			res = res_src + res_dst;
         	if ((e = (set_elem_matrix(i, j, res, &m_dst))) != E_OK)return e;
@@ -177,8 +177,8 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
   	
     T_TYPE res = V_NULL;
     // recorro las matrices y multiplico por el escalar guardando en mc
-    for (int i = 0 ; i < get_rows(*mc); ++i){
-      for (int j = 0; j < get_cols(*mc); ++j) {
+    for (int i = 0 ; i <= get_rows(*mc); ++i){
+      for (int j = 0; j <= get_cols(*mc); ++j) {
           if ((e=(get_elem_matrix(i, j, &res, mb))) == E_OK){
           	res *= a;
       			if ((e = (set_elem_matrix(i, j, res, mc))) != E_OK) return e;
@@ -195,8 +195,8 @@ error_t mult_scalar_inplace(T_TYPE a, matrix_t *m_dst) // idem mult_scalar pero 
 
   T_TYPE res = V_NULL;
   
-  for (int i = 0 ; i < get_rows(m_dst); ++i){
-    for (int j = 0; j < get_cols(m_dst); ++j){
+  for (int i = 0 ; i <= get_rows(m_dst); ++i){
+    for (int j = 0; j <= get_cols(m_dst); ++j){
       if((e =(get_elem_matrix(i,j, &res, m_dst))) == E_OK){
         res *= a;
         if((e = (set_elem_matrix(i,j, res, &m_dst))) != E_OK) return e;
@@ -241,7 +241,7 @@ error_t null_matrix(unsigned int n, matrix_t **mc)
 error_t idty_matrix(unsigned int n, matrix_t **m) // diagonal en 1
 {
   null_matrix(n, m);
-  for (int i=0 ; i < n; i++) {
+  for (int i= 0 ; i < n; i++) {
   	if (!set_elem_matrix(i,i,1,m)) return E_SIZE_ERROR;
   }
   return E_OK;      
@@ -252,11 +252,11 @@ error_t mult(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
   if (!ma) return E_ALLOC_ERROR;
   if (!mb) return E_ALLOC_ERROR;
   if (check_dimetions(ma, get_rows(mb), get_cols(mb) == E_OK)){
-  	if ((e = (create_and_fill_matrix(get_rows(ma), get_cols(mb), V_NULL, mc))) == E_OK) {  
+  	if ((e = (create_and_fill_matrix(get_rows(ma) + 1, get_cols(mb) + 1, V_NULL, mc))) == E_OK) {  
 	  	T_TYPE valA, valB, sum = 0;
-     	for (int i = 0; i < get_rows(ma); ++i) { 
-        for (int j = 0; j < get_cols(mb); ++j) {
-          for (int k = 0; k < get_rows(mb); ++k) {
+     	for (int i = 0; i <= get_rows(ma); ++i) { 
+        for (int j = 0; j <= get_cols(mb); ++j) {
+          for (int k = 0; k <= get_rows(mb); ++k) {
             if ((e = (get_elem_matrix(i, k, &valA, ma))) != E_OK) return e;
             if ((e = (get_elem_matrix(k, j, &valB, mb))) != E_OK) return e;
             sum = sum + (valA * valB); //sumatoria de multiplicaciones
@@ -293,7 +293,7 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 {
   if ( check_dimetions(ma, get_rows(mb), get_cols(mb))){
     for(int i=0;i<(mb->rows)*(mb->cols);i++){ // como mi matriz esta alamcenada de manera que es un arreglo unidimencional, multiplico para obtener el largo exacto 
-     	if (mb->data[i] - ma->data[i] >=  V_DELTA_PRECS){ // como lo de adentro es una flotante busco tener un acercamiento a 0 con V_DELTA_PRECS
+     	if (mb->data[i] - ma->data[i] > V_DELTA_PRECS){ // como lo de adentro es una flotante busco tener un acercamiento a 0 con V_DELTA_PRECS
         	return 0; //false 
         }
     }
@@ -423,16 +423,13 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
   matrix_t *m = NULL;
   m = malloc(sizeof(matrix_t));
   if (!m) {
-   // exit(E_ALLOC_ERROR);
-   output_error(NULL, E_ALLOC_ERROR);
+   
    return NULL;
   }
 
   m->data = NULL;
   m->data = malloc(nrows * ncols * sizeof(T_TYPE));
   if (!m->data) {
-    // exit(E_ALLOC_ERROR);
-    output_error(NULL, E_ALLOC_ERROR);
     return NULL;
   }
   
