@@ -22,7 +22,10 @@ void imprimir_Mat(matrix_t* m){
 }
 
 int main(int argc, char *argv[]){
-    
+    printf("%d ", argc);
+    for (int i = 0; i < argc; ++i){
+        printf("%s \n",argv[i]);
+    }
     char* arch1 = "Tests/test1.m";
     matrix_t* matrisTest = NULL;
     matrix_t* matrisTest2 = NULL;

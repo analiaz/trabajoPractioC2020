@@ -34,7 +34,7 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 		set_ffmt_matrix(m, auxFormat); 
 		
     
-    char * linea = " "; // guarda para leer del archivo
+    char * linea = NULL; // guarda para leer del archivo
 		unsigned int row = 0, col = 0; // mantener una guia de en que posicion se guarda cada elemento que se leedl archivo
 		char separador[] = " "; // contiene los caracteres que se utilizan como separadores de los valores que vienen en el archivo en este caso solamente "un espacio en blanco"
 		
@@ -78,7 +78,7 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
 {
   if (!m) {fclose(fp); return E_ALLOC_ERROR;} // se verifica que exista m
 
-  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt ,m->rows, m->cols); // se imprime la cabecera del archivo (formato y dimenciones)
+  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt+1 ,m->rows, m->cols); // se imprime la cabecera del archivo (formato y dimenciones)
   fprintf(fp, "%d %d \n", m->rows, m->cols ); //se imprime filas y columnas
   T_TYPE val = V_NULL;
 
@@ -106,9 +106,8 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
     //recorro la matriz de entrada m_src y cargo en m_dst
     for (int i = 0; i <= get_rows(m_src); ++i){
       for (int j = 0; j <= get_cols(m_src); ++j){
-        if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
-            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){}
-            else return E_NOTIMPL_ERROR;
+        if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){ // recupera el valor de la matriz de entrada
+            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){ return e;} //setea el valor en la matriz de destino
         } else return e;
       }
     } return E_OK;

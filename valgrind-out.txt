@@ -1,0 +1,69 @@
+==4447== Memcheck, a memory error detector
+==4447== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==4447== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
+==4447== Command: ./empezar
+==4447== Parent PID: 3303
+==4447== 
+==4447== Conditional jump or move depends on uninitialised value(s)
+==4447==    at 0x48ECB7B: __vfprintf_internal (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48D8959: fprintf (in /usr/lib/libc-2.31.so)
+==4447==    by 0x109AB5: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109739: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== Use of uninitialised value of size 8
+==4447==    at 0x48D2B3B: _itoa_word (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48EC4EF: __vfprintf_internal (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48D8959: fprintf (in /usr/lib/libc-2.31.so)
+==4447==    by 0x109AB5: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109739: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== Conditional jump or move depends on uninitialised value(s)
+==4447==    at 0x48D2B4C: _itoa_word (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48EC4EF: __vfprintf_internal (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48D8959: fprintf (in /usr/lib/libc-2.31.so)
+==4447==    by 0x109AB5: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109739: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== Conditional jump or move depends on uninitialised value(s)
+==4447==    at 0x48ED428: __vfprintf_internal (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48D8959: fprintf (in /usr/lib/libc-2.31.so)
+==4447==    by 0x109AB5: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109739: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== Conditional jump or move depends on uninitialised value(s)
+==4447==    at 0x48EC666: __vfprintf_internal (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48D8959: fprintf (in /usr/lib/libc-2.31.so)
+==4447==    by 0x109AB5: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109739: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== 
+==4447== Process terminating with default action of signal 11 (SIGSEGV): dumping core
+==4447==  Bad permissions for mapped region at address 0x10C228
+==4447==    at 0x483DEC3: memcpy@GLIBC_2.2.5 (vg_replace_strmem.c:1032)
+==4447==    by 0x48F7A23: _IO_getline_info (in /usr/lib/libc-2.31.so)
+==4447==    by 0x48F68F9: fgets (in /usr/lib/libc-2.31.so)
+==4447==    by 0x10B0DA: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x1098E0: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x109787: ??? (in /home/analiaz/Educación/2020-1/trabajo practico/2020-tpi/trabajoPracticoC2020/empezar)
+==4447==    by 0x48A8001: (below main) (in /usr/lib/libc-2.31.so)
+==4447== 
+==4447== HEAP SUMMARY:
+==4447==     in use at exit: 936 bytes in 17 blocks
+==4447==   total heap usage: 21 allocs, 4 frees, 10,624 bytes allocated
+==4447== 
+==4447== LEAK SUMMARY:
+==4447==    definitely lost: 48 bytes in 2 blocks
+==4447==    indirectly lost: 64 bytes in 2 blocks
+==4447==      possibly lost: 0 bytes in 0 blocks
+==4447==    still reachable: 824 bytes in 13 blocks
+==4447==         suppressed: 0 bytes in 0 blocks
+==4447== Rerun with --leak-check=full to see details of leaked memory
+==4447== 
+==4447== Use --track-origins=yes to see where uninitialised values come from
+==4447== For lists of detected and suppressed errors, rerun with: -s
+==4447== ERROR SUMMARY: 5 errors from 5 contexts (suppressed: 0 from 0)
