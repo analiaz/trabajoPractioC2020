@@ -23,6 +23,9 @@ short list_is_empty(const t_list l){
 // fijarse que devuelve un floatt deberia ser un error ponele
 t_data list_add(t_list *l, t_data e){
   t_list_node *node = malloc(sizeof(t_list_node));
+  if (!node) {
+    return 0;
+  }
   node->data = e;
   node->next = NULL;
   if (*l == NULL) *l = node;

@@ -26,7 +26,7 @@ typedef struct matrix {
 /***
  * Carga la matriz desde un archivo. El resultado queda en "m".
  */
-error_t read_matrix(FILE *fp, matrix_t *m);
+error_t read_matrix(FILE *fp, matrix_t **m);
 
 /***
  * Almacena la matriz en un archivo. El origen es "mc".

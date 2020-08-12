@@ -22,19 +22,20 @@ error_t get_ffmt_matrix(matrix_t *m, matrix_fmt_t  *fmt)
 }
 
 
-error_t read_matrix(FILE *fp, matrix_t *m)
+error_t read_matrix(FILE *fp, matrix_t **m)
 {
 	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de la matriz (si es 0 = formato M1)
 	
   if(!auxFormat){ // Si el formato es M1
 		
 		t_matrix_file_handler_dimensions dim = matrix_file_handler_m1_dimensions(fp); // asigno dimesion (fila, columna) de la matriz leido desde el archivo
-		m = init_matrix(dim.rows, dim.columns); 
-		clear_matrix(m); // lo inicializo en 0
-		set_ffmt_matrix(m, auxFormat); 
+		*m = init_matrix(dim.rows, dim.columns); 
+
+    if ((*m) == NULL){return E_ALLOC_ERROR;}
+		set_ffmt_matrix(*m, auxFormat); 
 		
     
-    char * linea = NULL; // guarda para leer del archivo
+    char * linea = malloc(1024 * sizeof(char)); // guarda para leer del archivo
 		unsigned int row = 0, col = 0; // mantener una guia de en que posicion se guarda cada elemento que se leedl archivo
 		char separador[] = " "; // contiene los caracteres que se utilizan como separadores de los valores que vienen en el archivo en este caso solamente "un espacio en blanco"
 		
@@ -47,18 +48,21 @@ error_t read_matrix(FILE *fp, matrix_t *m)
 				char *ptr = strtok(linea, separador); // lee linea hasta encontrar separador, retornando lo que leyo y dejando en linea el resto de la cadena 
 				T_TYPE value = V_NULL; // se quedara con el valos de sscanf
 
-				while(ptr != NULL){ 
+        bool flag = true;
+				while(ptr != NULL && flag){ 
 					printf("%s \n", ptr); 
 					int retVal = sscanf(ptr, "%lf", &value); // se convierte el valor leido a flotante 
 					printf("%lf \n", value); // testea la correcta convercion
 					
 
-					if ( (e = (set_elem_matrix(row, col, value, &m))) != E_OK ) {fclose(fp); return e; }; // se intenta agregar elelemento a la matriz
-					
+					if ( (e = (set_elem_matrix(row, col, value, m))) != E_OK ) {fclose(fp); return e; }; // se intenta agregar elelemento a la matriz
+					printf("agrego %lf a la matriz \n",value);
           if (++col == dim.columns){ // chequea si llego al final de la fila y por consiguiente si tiene que cambiar
 						col = 0;
-						if (++row == dim.rows) { fclose(fp); return E_READ_ERROR;} // verifica que no se vaya de rango en las filas 
-					}
+            printf("cambio de fila\n");
+
+						if (++row == dim.rows) { flag = false;} //printf("se fue de rango\n"); fclose(fp); return E_READ_ERROR;}  // verifica que no se vaya de rango en las filas 
+          }
 					
 					ptr = strtok(NULL, separador); // se lee otra parte de la linea hasta encontrar el separador, siendo el primer parametro null para tomar desde el punto que dejo en la vez anterior
 				} 
@@ -78,7 +82,7 @@ error_t write_matrix(FILE *fp, const matrix_t *m)
 {
   if (!m) {fclose(fp); return E_ALLOC_ERROR;} // se verifica que exista m
 
-  fprintf(fp, "M%d \n ## Matriz %d x %d \n ",m->fmt+1 ,m->rows, m->cols); // se imprime la cabecera del archivo (formato y dimenciones)
+  fprintf(fp, "M%d \n## Matriz %d x %d \n",m->fmt+1 ,m->rows, m->cols); // se imprime la cabecera del archivo (formato y dimenciones)
   fprintf(fp, "%d %d \n", m->rows, m->cols ); //se imprime filas y columnas
   T_TYPE val = V_NULL;
 
@@ -431,7 +435,7 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
   if (!m->data) {
     return NULL;
   }
-  
+//  m->fmt = malloc(sizeof(matrix_fmt_t)); No anda
   m->rows = nrows;
   m->cols = ncols;
 

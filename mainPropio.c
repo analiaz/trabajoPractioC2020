@@ -72,18 +72,19 @@ int main(int argc, char *argv[]){
     else printf("mult no funciona");
 
     if ((err = idty_matrix(2, &idt_prub)) == E_OK) imprimir_Mat(idt_prub); // no funciona
-    else printf("no funciona \n");
+    else printf("no funciona idty\n");
+
+    printf("---read_matrix----\n");
+    if ((err = read_matrix(f, &matrisTest3)) == E_OK) imprimir_Mat(matrisTest3);
+    else printf("no funciona read");    
 
     printf("---write_matrix----\n");
     // crea bien el archivo pero no entiendo si lo que sale en consola es un error...
     char* arch2 = "Tests/prueba.m";
     FILE* f1 = fopen(arch2, "w");
-    if ((err = write_matrix(f1,matrisTest)) == E_OK) printf("se creo \n\n");
+    if ((err = write_matrix(f1, matrisTest3)) == E_OK) printf("se creo \n\n");
     else printf("no funciona read");    
 
-    printf("---read_matrix----\n");
-    if ((err = read_matrix(f, matrisTest3)) == E_OK) imprimir_Mat(matrisTest3);
-    else printf("no funciona read");    
 
 
     return 0;
