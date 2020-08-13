@@ -19,7 +19,7 @@ error_t procesar_funciones(char *arch1, char *arch2, char *archS, char *op, T_TY
         dup_matr que recibe una matriz y devuelveotra matriz
         escribo la matriz (devolviendola en un file) */
         FILE *f = fopen(arch1,"r");
-        if ( (e = (read_matrix(f, ma))) != E_OK) return e;
+        if ( (e = (read_matrix(f, &ma))) != E_OK) return e;
         if ( (e = (dup_matrix(ma, &ms))) != E_OK) return e;
         FILE *f2 = fopen(archS,"w");
         if ( (e = (write_matrix(f2, ms))) != E_OK) return e;
@@ -27,15 +27,15 @@ error_t procesar_funciones(char *arch1, char *arch2, char *archS, char *op, T_TY
     } else if (strcmp(op,"sum") == 0) {
         FILE *f1 = fopen(arch1,"r");
         FILE *f2 = fopen(arch2,"r");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e;
-        if ((e = (read_matrix(f2, mb))) != E_OK) return e;
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e;
+        if ((e = (read_matrix(f2, &mb))) != E_OK) return e;
         if ((e = (sum(ma, mb, &ms))) != E_OK) return e;
         FILE *f3 = fopen(archS,"w");
         if ((e = (write_matrix(f3, ms))) != E_OK) return e;
         return E_OK;
     } else if (strcmp(op, "mult_scalar") == 0){
-        FILE *f1 = fopen(arch1,"w");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e;
+        FILE *f1 = fopen(arch1,"r");
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e;
         if ((e = (mult_scalar(scalar, ma, &ms))) != E_OK) return e;       
         FILE *f2 = fopen(archS,"w");
         if ((e = (write_matrix(f2, ms))) != E_OK) return e;
@@ -43,22 +43,22 @@ error_t procesar_funciones(char *arch1, char *arch2, char *archS, char *op, T_TY
     } else if (strcmp(op,"mult") == 0) {
         FILE *f1 = fopen(arch1,"r");
         FILE *f2 = fopen(arch2,"r");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e;
-        if ((e = (read_matrix(f2, mb))) != E_OK) return e;
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e;
+        if ((e = (read_matrix(f2, &mb))) != E_OK) return e;
         if ((e = (mult(ma, mb, &ms))) != E_OK) return e;
         FILE *f3 = fopen(archS,"w");
         if ((e = (write_matrix(f3, ms))) != E_OK) return e;
         return E_OK;
     } else if (strcmp(op, "idty") == 0){ 
         FILE *f1 = fopen(arch1, "r");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e; 
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e; 
         if ((e = (idty_matrix(get_cols(ma),&ms))) != E_OK) return e;
         FILE *f2 = fopen(archS,"w");
         if ((e = (write_matrix(f2, ms))) != E_OK) return e;
         return E_OK;
     } else if (strcmp(op,"null") == 0) {
         FILE *f1 = fopen(arch1, "r");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e; 
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e; 
         if ((e = (null_matrix(get_cols(ma),&ms))) != E_OK) return e;
         FILE *f2 = fopen(archS,"w");
         if ((e = (write_matrix(f2, ms))) != E_OK) return e;
@@ -66,8 +66,8 @@ error_t procesar_funciones(char *arch1, char *arch2, char *archS, char *op, T_TY
     } else if (strcmp(op,"cmp") == 0){
         FILE *f1 = fopen(arch1,"r");
         FILE *f2 = fopen(archS,"r");
-        if ((e = (read_matrix(f1, ma))) != E_OK) return e;
-        if ((e = (read_matrix(f2, mb))) != E_OK) return e;
+        if ((e = (read_matrix(f1, &ma))) != E_OK) return e;
+        if ((e = (read_matrix(f2, &mb))) != E_OK) return e;
         int n = cmp_matrix(ma, mb);
         if ((e = (create_and_fill_matrix(1, 1, n, &ms))) != E_OK) return e;
         FILE *f3 = fopen(archS,"w");     
@@ -122,7 +122,7 @@ error_t calcular_(char *argv[]){
             return E_READ_ERROR;
         } 
         archS = argv[6];        
-    } else if (strcmp(argv[3],".*") == 0) {
+    } else if (strcmp(argv[3],".s") == 0) { //no se como escapar el asterisco
         ope = "mult_scalar";
         arch1 = argv[2];
         FILE * f = fopen(arch1, "r");
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]){
     if(argc >= 2){
         
         if (strcmp(argv[1],"--calc") == 0) {
-            if (argc >= 6 && argc <= 7 ) return calcular_(argv);// ahora deberia estar controlado los parametros
+            if (argc >= 6 && argc <= 7 ) return calcular_(argv);// no controlado los parametros
             else printf("el formato es erroneo");
             return 0;
         }
@@ -173,6 +173,7 @@ int main(int argc, char *argv[]){
 
         for(int i= 1; i < argc; ++i){
             operador = argv[i];  // ahora guarde un comando, se queda con la direccion del primer caracter
+            printf("%s", operador);
             if (strcmp(operador,"--in1") == 0 || (strcmp(operador,"-1")== 0)){
                 arch1 = argv[++i]; // valida si hay un file antes de pasar a procesar funciones
                 matrix_file_handler_from_filename(arch1);
@@ -191,7 +192,8 @@ int main(int argc, char *argv[]){
                 printf("--out|-o nombre_archivo");
                 printf("--scalar|-s número");
                 printf("--op|-p (dup|sum|mult_scalar|mult|idty|null|cmp)");
-            } else printf("Se a introducido mal algun argumento para mas informacion --help");
+                return 0;
+            } else {printf("Se a introducido mal algun argumento para mas informacion --help\n"); return 0;}
         }
         procesar_funciones(arch1, arch2, archS, ope, scal);
     } else {

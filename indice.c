@@ -184,9 +184,9 @@ int main(int argc, char *argv[]){
                 archS = argv[++i];                
             } else if ((strcmp(operador,"--scalar") == 0 || (strcmp(operador,"-s")== 0))){
                 int ret = sscanf(argv[++i], "%lf", &scal);
-            } else if ((strcmp(operador, "--op") == 0 || (strcmp(operador, "p")== 0))){
+            } else if ((strcmp(operador, "--op") == 0 || (strcmp(operador, "-p")== 0))){
                   ope = argv[++i];
-            } else if ((strcmp(operador, "--help"))){
+            } else if ((strcmp(operador, "help"))){
                 printf("--in1|-1 nombre_archivo");
                 printf("--in2|-2 nombre_archivo");
                 printf("--out|-o nombre_archivo");

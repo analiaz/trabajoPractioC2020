@@ -63,6 +63,25 @@ int main(int argc, char *argv[]){
     if ((err = null_matrix(2, &null_prub)) == E_OK) imprimir_Mat(null_prub);
     else printf("no funciona");
 
+    printf("----clear_matrix------\n");
+    if ((err = clear_matrix(matrisTest)) == E_OK) imprimir_Mat(matrisTest);
+    else printf("no funciona clear");
+/*
+    t_list *l = NULL; 
+
+    printf("--------matrix2list----\n");
+    if ((err = matrix2list(matrisTest,l)))
+    else printf("no funciona clear\n");
+*/
+  
+/*
+    printf("\n-----get_col-----------\n");
+
+    printf("\n-------get_row---------\n");
+*/
+    printf("\n-----free_matrix-----\n");
+    if ((err = free_matrix(&matrisTest2))== E_OK){}
+    
 
     printf("\n---dup----\n");
     if ((err = dup_matrix(matrisTest,&matrisTest2))== E_OK) imprimir_Mat(matrisTest2); //no funciona
@@ -85,6 +104,9 @@ int main(int argc, char *argv[]){
     if ((err = write_matrix(f1, matrisTest3)) == E_OK) printf("se creo \n\n");
     else printf("no funciona read");    
 
+    printf("----resize_matrix-----");
+    if ((err = resize_matrix(1, 1, &matrisTest)) == E_OK) imprimir_Mat(matrisTest); // no funca, se muere dentro d mate.c en un malloc
+    else printf("no funciona resize");
 
 
     return 0;

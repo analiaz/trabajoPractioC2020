@@ -55,7 +55,7 @@ error_t read_matrix(FILE *fp, matrix_t **m)
 					printf("%lf \n", value); // testea la correcta convercion
 					
 
-					if ( (e = (set_elem_matrix(row, col, value, m))) != E_OK ) {fclose(fp); return e; }; // se intenta agregar elelemento a la matriz
+					if ( (e = (set_elem_matrix(row, col, value, m))) != E_OK ) {fclose(fp); free(linea);  return e; }; // se intenta agregar elelemento a la matriz
 					printf("agrego %lf a la matriz \n",value);
           if (++col == dim.columns){ // chequea si llego al final de la fila y por consiguiente si tiene que cambiar
 						col = 0;
@@ -68,6 +68,7 @@ error_t read_matrix(FILE *fp, matrix_t **m)
 				} 
 			}
 		}
+    free(linea);
     fclose(fp); 
 		return E_OK;
 	}	
@@ -307,13 +308,16 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 
 error_t free_matrix(matrix_t **m)
 {
-  for (int i = 0; i < get_rows(*m); ++i){
-    for (int j =0; j < get_cols(*m); ++j){
-     	free((*m)->data + (sizeof(T_TYPE) * ( i + i * (j-1) + j))); //Libera la memoria ocupada por el elemento almacenado en data 
+  if (!(*m)) return E_ALLOC_ERROR;
+  for (int i = 0; i <= get_rows(*m); ++i){
+    for (int j =0; j <= get_cols(*m); ++j){
+     	free((*m)->data + (sizeof(T_TYPE) * ( i + i * (j-1) + j)));
+      printf("se libero memoria %d, %d \n", i, j); //Libera la memoria ocupada por el elemento almacenado en data 
     }
   }
+  (*m)->data = NULL;
   free(*m);
-  
+  *m = NULL;
   return E_OK;      
 }
 
@@ -368,7 +372,7 @@ error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la
 {
   if (!ma) return E_ALLOC_ERROR;
   list_create(l);
-  if (l) {
+ // if (l) {
     T_TYPE aux;
     for (int i = 0; i < get_rows(ma); ++i){
       for (int j = 0; j < get_cols(ma); j++){
@@ -377,7 +381,7 @@ error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la
         } else return e;
       }
     }
-  }
+//  }
   return E_OK; 
   }
 

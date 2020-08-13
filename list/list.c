@@ -3,7 +3,7 @@
 
 // completar
 void list_create(t_list *l){
-  *l = NULL;
+  l = NULL;
 }
 
 // ve si el elemento esta en la lista
