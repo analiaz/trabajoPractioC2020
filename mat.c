@@ -174,6 +174,9 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
 {
   // se verifica que existan las matrices
   if (!mb) return E_ALLOC_ERROR;
+  if (!mc) {
+    *mc = init_matrix(get_rows(mb)+1, get_cols(mb)+1); 
+  };
   if (!mc) return E_ALLOC_ERROR;
 
   // en la multiplicacion escalar las columnas de mb y mc tiene que ser iguales
