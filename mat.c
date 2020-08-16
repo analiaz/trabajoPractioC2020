@@ -105,18 +105,19 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
 {
   if (!m_src) return E_ALLOC_ERROR; // se verifica que exista m_src
 
-  if (create_and_fill_matrix(get_rows(m_src) + 1, get_cols(m_src) + 1, V_NULL, m_dst)){ // se crea la matriz de destino con la fila y columna de la matriz de inicio m_src
+  if ((e = create_and_fill_matrix(get_rows(m_src)+1, get_cols(m_src)+1, 0.0, m_dst)) == E_OK){
     
     T_TYPE res = V_NULL;
     //recorro la matriz de entrada m_src y cargo en m_dst
     for (int i = 0; i <= get_rows(m_src); ++i){
       for (int j = 0; j <= get_cols(m_src); ++j){
-        if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){ // recupera el valor de la matriz de entrada
-            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){ return e;} //setea el valor en la matriz de destino
+        if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
+            printf("se leyo %f\n",res); // recupera el valor de la matriz de entrada
+            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){printf("fallo incertando en %d%d",i,j); return e;} //setea el valor en la matriz de destino
         } else return e;
       }
     } return E_OK;
-  } else return E_ALLOC_ERROR;
+  } else {printf("fallo create and fill"); return E_ALLOC_ERROR;}
 }
 
 error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
@@ -249,7 +250,7 @@ error_t idty_matrix(unsigned int n, matrix_t **m) // diagonal en 1
 {
   null_matrix(n, m);
   for (int i= 0 ; i < n; i++) {
-  	if (!set_elem_matrix(i,i,1,m)) return E_SIZE_ERROR;
+  	if ((e = set_elem_matrix(i,i,1.0,m)) != E_OK){printf("fallo la insersion en %d",i); return E_SIZE_ERROR;}
   }
   return E_OK;      
 }
@@ -399,28 +400,24 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
   if (!aux) {
     return E_ALLOC_ERROR;
   };
-  T_TYPE val = V_NULL;
+  T_TYPE val = 0.0;
+  T_TYPE *guia = (*ma)->data;
   int pos;
-  /**
-  int filas = (*ma)->rows;
-  //Checkea si debe completar nuevos valores
-  if (newrows > filas)
-  {
-    int filasVacias =  newrows - filas;
-  }
-  **/
   for (int i = 0; i < newrows; ++i ){
-    for (int j = 0; i < newcols; ++j){
+    for (int j = 0; j < newcols; ++j){
     	pos = i + i * (j - 1) + j; 
-      	if ((e = (get_elem_matrix(i, j, &val, *ma))) == E_OK){
-        	aux[pos] = val;
-        	free((*ma)->data + (sizeof(T_TYPE) * pos)); //Libera la memoria ocupada por el elemento almacenado en data
-      	} else {
-      		aux[pos] = V_NULL;
-      	} 
-    }
+      if ( (e = get_elem_matrix(i, j, &val, *ma)) == E_OK) {
+       	printf("leyo %d %d\n",i,j);
+        aux[pos] = val;
+//        	free((*ma)->data + (sizeof(T_TYPE) * pos)); //Libera la memoria ocupada por el elemento almacenado en data
+      } else {
+        printf("no se pudo leer valor");
+      	aux[pos] = V_NULL;
+      
+      } 
+    } 
   }
-
+  free((*ma)->data);
   (*ma)->data = aux;
   (*ma)->cols = newcols;
   (*ma)->rows = newrows;

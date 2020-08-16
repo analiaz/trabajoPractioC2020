@@ -32,6 +32,7 @@ error_t procesar_funciones(FILE *f1, FILE *f2, char *archS, char *op, T_TYPE sca
         return E_OK;
     } else if (strcmp(op, "mult_scalar") == 0){
         if ((e = (read_matrix(f1, &ma))) != E_OK){printf("fallo el read"); return e;}
+        if ((e = create_and_fill_matrix(get_rows(ma)+1, get_cols(ma)+1, 0.0, &ms)) != E_OK) return e;
         if ((e = (mult_scalar(scalar, ma, &ms))) != E_OK){printf("fallo multiescalar"); return e;};       
         FILE *fout = fopen(archS,"w");
         if ((e = (write_matrix(fout, ms))) != E_OK){printf("fallo write"); return e;}
@@ -45,7 +46,7 @@ error_t procesar_funciones(FILE *f1, FILE *f2, char *archS, char *op, T_TYPE sca
         return E_OK;
     } else if (strcmp(op, "idty") == 0){ 
         if ((e = (read_matrix(f1, &ma))) != E_OK) return e; 
-        if ((e = (idty_matrix(get_cols(ma),&ms))) != E_OK) return e;
+        if ((e = (idty_matrix(get_cols(ma)+1,&ms))) != E_OK) return e;
         FILE *fout = fopen(archS,"w");
         if ((e = (write_matrix(fout, ms))) != E_OK) return e;
         return E_OK;
@@ -124,7 +125,7 @@ error_t calcular_(char *argv[]){
         int ret = sscanf(argv[4], "%lf", &scal);
         archS = argv[6];       
     } else if (strcmp(argv[3],"id")== 0) {
-        ope = "idty_matrix";
+        ope = "idty";
         f1 = fopen(argv[2],"r");
         if (f1 == NULL){
             printf("Direccion de archivo invalido\n");

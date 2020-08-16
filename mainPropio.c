@@ -30,6 +30,7 @@ int main(int argc, char *argv[]){
     matrix_t* matrisTest = NULL;
     matrix_t* matrisTest2 = NULL;
     matrix_t* matrisTest3 = NULL;
+    matrix_t* matrisDup = NULL;
     matrix_t* res = NULL;
     matrix_t* null_prub = NULL;
     matrix_t* idt_prub = NULL;
@@ -45,6 +46,14 @@ int main(int argc, char *argv[]){
     printf("---comp----\n");
     if (cmp_matrix(matrisTest, matrisTest2)) printf("Las matrices son iguales \n");
     else printf("las matrices son distintas \n");
+   
+    printf("\n---mult----\n");
+    if ((err = mult(matrisTest, matrisTest2,&res))== E_OK) imprimir_Mat(res);  //funciona mal, no multiplica bien
+    else printf("mult no funciona");
+    printf("----resize_matrix-----");
+    if ((err = resize_matrix(3, 3, &matrisTest)) == E_OK) imprimir_Mat(matrisTest); 
+    else printf("no funciona resize");
+
     printf("---sum----\n");
     if ((err = sum(matrisTest,matrisTest2,&res))== E_OK) imprimir_Mat(res);
     else {
@@ -83,14 +92,13 @@ int main(int argc, char *argv[]){
     if ((err = free_matrix(&matrisTest2))== E_OK){}
     
 
-    printf("\n---dup----\n");
-    if ((err = dup_matrix(matrisTest,&matrisTest2))== E_OK) imprimir_Mat(matrisTest2); //no funciona
-    else printf("no funciona duplicar");
-    printf("\n---mult----\n");
-    if ((err = mult(matrisTest, matrisTest2,&res))== E_OK) imprimir_Mat(res);  //funciona mal
-    else printf("mult no funciona");
 
-    if ((err = idty_matrix(2, &idt_prub)) == E_OK) imprimir_Mat(idt_prub); // no funciona
+    printf("\n---dup----\n");
+    if ((err = dup_matrix(matrisTest,&matrisDup))== E_OK) imprimir_Mat(matrisDup); 
+    else printf("no funciona duplicar");
+
+    printf("\n---idty----\n");
+    if ((err = idty_matrix(2, &idt_prub)) == E_OK) imprimir_Mat(idt_prub);
     else printf("no funciona idty\n");
 
     printf("---read_matrix----\n");
@@ -98,15 +106,12 @@ int main(int argc, char *argv[]){
     else printf("no funciona read");    
 
     printf("---write_matrix----\n");
-    // crea bien el archivo pero no entiendo si lo que sale en consola es un error...
+    
     char* arch2 = "Tests/prueba.m";
     FILE* f1 = fopen(arch2, "w");
     if ((err = write_matrix(f1, matrisTest3)) == E_OK) printf("se creo \n\n");
     else printf("no funciona read");    
 
-    printf("----resize_matrix-----");
-    if ((err = resize_matrix(1, 1, &matrisTest)) == E_OK) imprimir_Mat(matrisTest); // no funca, se muere dentro d mate.c en un malloc
-    else printf("no funciona resize");
 
 
     return 0;
