@@ -1,6 +1,3 @@
-/*matrix.h, list.h, matrix.c, lista.c*/
-//index.c
-
 #include <stdio.h>
 #include "list/list.h"
 #include "mat.h"
@@ -13,11 +10,7 @@
 error_t procesar_funciones(FILE *f1, FILE *f2, char *archS, char *op, T_TYPE scalar){
     matrix_t *ma = NULL, *mb = NULL, *ms = NULL;
     error_t e;
-    // TEST if (strcmp(string, "B1") == 0)  {   // do something }  else if (strcmp(string, "xxx") == 0) {   // do something else } /* more else if clauses */ else /* default: */ { }
     if (strcmp(op,"dup") == 0){ 
-        /*leer la matriz
-        dup_matr que recibe una matriz y devuelveotra matriz
-        escribo la matriz (devolviendola en un file) */
         if ( (e = (read_matrix(f1, &ma))) != E_OK) return e;
         if ( (e = (dup_matrix(ma, &ms))) != E_OK) return e;
         FILE *fout = fopen(archS,"w");
@@ -82,7 +75,6 @@ mult_scalar​
 ○ id​ equivale a ​ ”idty”
 */
 
-// controlar que respeta el formato
 error_t calcular_(char *argv[]){
     char  *ope, *archS;
     double scal;
@@ -115,7 +107,7 @@ error_t calcular_(char *argv[]){
             return E_READ_ERROR;
         } 
         archS = argv[6];        
-    } else if (strcmp(argv[3],".*") == 0) { //no se como escapar el asterisco
+    } else if (strcmp(argv[3],".*") == 0) { 
         ope = "mult_scalar";
         f1 = fopen(argv[2], "r");
         if (f1 == NULL){
@@ -156,7 +148,7 @@ int main(int argc, char *argv[]){
     if(argc >= 2){
         
         if (strcmp(argv[1],"--calc") == 0) {
-            if (argc >= 6 && argc <= 7 ) return calcular_(argv);// no controlado los parametros
+            if (argc >= 6 && argc <= 7 ) return calcular_(argv);
             else printf("el formato es erroneo");
             return 0;
         }

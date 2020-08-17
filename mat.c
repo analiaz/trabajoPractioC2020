@@ -24,7 +24,7 @@ error_t get_ffmt_matrix(matrix_t *m, matrix_fmt_t  *fmt)
 
 error_t read_matrix(FILE *fp, matrix_t **m)
 {
-	int auxFormat = matrix_file_handler_read_header(fp); // pido el fromato de la matriz (si es 0 = formato M1)
+	int auxFormat = matrix_file_handler_read_header(fp); // pido el formato de la matriz (si es 0 = formato M1)
 	
   if(!auxFormat){ // Si el formato es M1
 		
@@ -112,12 +112,11 @@ error_t dup_matrix(const matrix_t *m_src, matrix_t **m_dst)
     for (int i = 0; i <= get_rows(m_src); ++i){
       for (int j = 0; j <= get_cols(m_src); ++j){
         if((e = (get_elem_matrix(i, j, &res, m_src)) == E_OK)){
-            printf("se leyo %f\n",res); // recupera el valor de la matriz de entrada
-            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){printf("fallo incertando en %d%d",i,j); return e;} //setea el valor en la matriz de destino
+            if( (e = (set_elem_matrix(i, j, res, m_dst))) != E_OK){ return e;} //setea el valor en la matriz de destino
         } else return e;
       }
     } return E_OK;
-  } else {printf("fallo create and fill"); return E_ALLOC_ERROR;}
+  } else {return E_ALLOC_ERROR;}
 }
 
 error_t sum(const matrix_t *ma, const matrix_t *mb, matrix_t **mc)
@@ -250,7 +249,7 @@ error_t idty_matrix(unsigned int n, matrix_t **m) // diagonal en 1
 {
   null_matrix(n, m);
   for (int i= 0 ; i < n; i++) {
-  	if ((e = set_elem_matrix(i,i,1.0,m)) != E_OK){printf("fallo la insersion en %d",i); return E_SIZE_ERROR;}
+  	if ((e = set_elem_matrix(i,i,1.0,m)) != E_OK){ return E_SIZE_ERROR;}
   }
   return E_OK;      
 }
@@ -319,7 +318,8 @@ error_t free_matrix(matrix_t **m)
       printf("se libero memoria %d, %d \n", i, j); //Libera la memoria ocupada por el elemento almacenado en data 
     }
   }
-*/  (*m)->data = NULL;
+*/ 
+  (*m)->data = NULL;
   free(*m);
   *m = NULL;
   return E_OK;      
@@ -376,7 +376,6 @@ error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la
 {
   if (!ma) return E_ALLOC_ERROR;
   list_create(l);
- // if (l) {
     T_TYPE aux;
     for (int i = 0; i < get_rows(ma); ++i){
       for (int j = 0; j < get_cols(ma); j++){
@@ -385,7 +384,6 @@ error_t matrix2list(const matrix_t *ma, t_list *l) // guarda en la lista toda la
         } else return e;
       }
     }
-//  }
   return E_OK; 
   }
 
@@ -401,7 +399,6 @@ error_t resize_matrix(unsigned int newrows, unsigned int newcols, matrix_t **ma)
     return E_ALLOC_ERROR;
   };
   T_TYPE val = 0.0;
-  T_TYPE *guia = (*ma)->data;
   int pos;
   for (int i = 0; i < newrows; ++i ){
     for (int j = 0; j < newcols; ++j){
@@ -439,7 +436,6 @@ matrix_t *init_matrix(unsigned int nrows, unsigned int ncols)
   if (!m->data) {
     return NULL;
   }
-//  m->fmt = malloc(sizeof(matrix_fmt_t)); No anda
   m->rows = nrows;
   m->cols = ncols;
 
