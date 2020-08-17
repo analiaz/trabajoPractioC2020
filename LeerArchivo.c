@@ -54,16 +54,17 @@ const char * matrix_file_handler_codes[] = { "m1", "m2", NULL };
 t_matrix_file_handler_dimensions matrix_file_handler_m1_dimensions(FILE *f) {
   t_matrix_file_handler_dimensions d;
   char buffer[MAX_LENGTH];
-  while (1) {
-    if (matrix_file_handler_read_line(buffer, MAX_LENGTH, f)){
-      if (!matrix_file_handler_is_comment(buffer)) {
-        int ret = sscanf(buffer, "%ld %ld", &d.rows, &d.columns);
-        if (ret !=2) matrix_file_handler_manage_error("Error leyendo la dimension. Se esperaban dos enteros, se recibió %s\n", buffer);
-        return d;
-      }
-    }else matrix_file_handler_manage_error("Se alcanzó el fin de archivo sin encontrar las dimensiones\n");
-  }
+  while (matrix_file_handler_read_line(buffer, MAX_LENGTH, f)){
+    if (!matrix_file_handler_is_comment(buffer)) {
+      int ret = sscanf(buffer, "%ld %ld", &d.rows, &d.columns);
+      if (ret !=2) 
+        {d.rows = 0; d.columns = 0;}
+      return d;
+    }
+  } 
+  return d;
 }
+
 
 void matrix_file_handler_by_type_m1(FILE *f) {
   t_matrix_file_handler_dimensions d = matrix_file_handler_m1_dimensions(f);

@@ -175,7 +175,7 @@ error_t mult_scalar(T_TYPE a, const matrix_t *mb, matrix_t **mc)
 {
   // se verifica que existan las matrices
   if (!mb) return E_ALLOC_ERROR;
-  if (!mc) {
+  if (!(*mc)) {
     *mc = init_matrix(get_rows(mb)+1, get_cols(mb)+1); 
   };
   if (!mc) return E_ALLOC_ERROR;
@@ -313,13 +313,13 @@ int cmp_matrix(const matrix_t *ma, const matrix_t *mb)
 error_t free_matrix(matrix_t **m)
 {
   if (!(*m)) return E_ALLOC_ERROR;
-  for (int i = 0; i <= get_rows(*m); ++i){
+/*  for (int i = 0; i <= get_rows(*m); ++i){
     for (int j =0; j <= get_cols(*m); ++j){
      	free((*m)->data + (sizeof(T_TYPE) * ( i + i * (j-1) + j)));
       printf("se libero memoria %d, %d \n", i, j); //Libera la memoria ocupada por el elemento almacenado en data 
     }
   }
-  (*m)->data = NULL;
+*/  (*m)->data = NULL;
   free(*m);
   *m = NULL;
   return E_OK;      

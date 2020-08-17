@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include "mat.h"
-#include "list.h"
+#include "../mat.h"
+//#include "../list/list.h"
 
 #define SCALAR (0.5)
 
 int main()
 {
 
-  matrix_t  m;
-  matrix_t  ma;
+  matrix_t  *m;
+  matrix_t  *ma;
   matrix_t  *mb;
   matrix_t  *mc;
   matrix_t  *md;
@@ -18,7 +18,7 @@ int main()
   matrix_t  *m1;  
   matrix_t  *maux1, *maux2; 
   double     f;
-  list_t     l;
+//  list_t     l;
   
   if (read_matrix(stdin, &ma))
     {
@@ -208,11 +208,11 @@ int main()
       printf("\n");
     }
   printf("-------------\n");
-  l = ls_create();
+  /*l = ls_create();
   matrix2list(md, &l);
   ls_to_file(stdout, l);
   printf("\n-------------\n");
-  ls_free(&l);
+  ls_free(&l);*/
   free_matrix(&md);
   clear_matrix(&ma);
   write_matrix(stdout, &ma);
@@ -222,6 +222,7 @@ int main()
   free_matrix(&m1);
   return 0;
 }
+
 
 
 /*** EOF **/
