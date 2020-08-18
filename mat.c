@@ -50,16 +50,12 @@ error_t read_matrix(FILE *fp, matrix_t **m)
 
         bool flag = true;
 				while(ptr != NULL && flag){ 
-					printf("%s \n", ptr); 
 					int retVal = sscanf(ptr, "%lf", &value); // se convierte el valor leido a flotante 
-					printf("%lf \n", value); // testea la correcta convercion
 					
 
 					if ( (e = (set_elem_matrix(row, col, value, m))) != E_OK ) {fclose(fp); free(linea);  return e; }; // se intenta agregar elelemento a la matriz
-					printf("agrego %lf a la matriz \n",value);
           if (++col == dim.columns){ // chequea si llego al final de la fila y por consiguiente si tiene que cambiar
 						col = 0;
-            printf("cambio de fila\n");
 
 						if (++row == dim.rows) { flag = false;} //printf("se fue de rango\n"); fclose(fp); return E_READ_ERROR;}  // verifica que no se vaya de rango en las filas 
           }

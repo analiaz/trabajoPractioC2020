@@ -24,11 +24,11 @@ error_t procesar_funciones(FILE *f1, FILE *f2, char *archS, char *op, T_TYPE sca
         if ((e = (write_matrix(f3, ms))) != E_OK) return e;
         return E_OK;
     } else if (strcmp(op, "mult_scalar") == 0){
-        if ((e = (read_matrix(f1, &ma))) != E_OK){printf("fallo el read"); return e;}
+        if ((e = (read_matrix(f1, &ma))) != E_OK){ return e;}
         if ((e = create_and_fill_matrix(get_rows(ma)+1, get_cols(ma)+1, 0.0, &ms)) != E_OK) return e;
-        if ((e = (mult_scalar(scalar, ma, &ms))) != E_OK){printf("fallo multiescalar"); return e;};       
+        if ((e = (mult_scalar(scalar, ma, &ms))) != E_OK){return e;};       
         FILE *fout = fopen(archS,"w");
-        if ((e = (write_matrix(fout, ms))) != E_OK){printf("fallo write"); return e;}
+        if ((e = (write_matrix(fout, ms))) != E_OK){ return e;}
         return E_OK;
     } else if (strcmp(op,"mult") == 0) {
         if ((e = (read_matrix(f1, &ma))) != E_OK) return e;
@@ -80,7 +80,7 @@ error_t calcular_(char *argv[]){
     double scal;
 
     FILE *f1, *f2;
-
+    // dado el formato que se presento en la guia del trabajo practico, se supone posiciones exactas para cada argumento
     if (strcmp(argv[3],"+")== 0) {
         ope = "sum";
         f1 = fopen(argv[2],"r");
@@ -147,18 +147,19 @@ int main(int argc, char *argv[]){
 */
     if(argc >= 2){
         
-        if (strcmp(argv[1],"--calc") == 0) {
-            if (argc >= 6 && argc <= 7 ) return calcular_(argv);
+        if (strcmp(argv[1],"--calc") == 0) { //evalua que argv[1] sea --calc
+            if (argc >= 6 && argc <= 7 ) return calcular_(argv); // se chequea que los argumentos de --calc esten entre 6 y 7 
             else printf("el formato es erroneo");
             return 0;
         }
+        //declaracion de variables
         FILE *f1, *f2;
-        char *ope, *archS;
+        char *ope, *archS = NULL;
+        bool bf1 = false, bf2 = false, bfout = false, bop = false;
         double scal;
 
-        for(int i= 1; i < argc; ++i){
+        for(int i= 1; i < argc; ++i){ // recorro argv completo para no depender del orden en el que se ingresaron los argumentos
             operador = argv[i];  // ahora guarde un comando, se queda con la direccion del primer caracter
-            printf("%s\n", operador);
             if (strcmp(operador,"--in1") == 0 || (strcmp(operador,"-1")== 0)){
                 // valida si hay un file antes de pasar a procesar funciones
                 f1 = fopen(argv[++i],"r");
@@ -166,6 +167,7 @@ int main(int argc, char *argv[]){
                     printf("Direccion de archivo invalido\n");
                     return E_READ_ERROR;
                 } 
+                bf1 = true;
             } else if ((strcmp(operador,"--in2")== 0 || (strcmp(operador,"-2") == 0))){
                 // valida si hay un file antes de pasar a procesar funciones
                 f2 = fopen(argv[++i],"r");
@@ -173,12 +175,15 @@ int main(int argc, char *argv[]){
                     printf("Direccion de archivo invalido\n");
                     return E_READ_ERROR;
                 } 
+                bf2 = true;
             } else if ((strcmp(operador,"--out") == 0 || (strcmp(operador,"-o")== 0))){
-                archS = argv[++i];                
+                archS = argv[++i];
+                bfout = true;                
             } else if ((strcmp(operador,"--scalar") == 0 || (strcmp(operador,"-s")== 0))){
                 int ret = sscanf(argv[++i], "%lf", &scal);
             } else if ((strcmp(operador, "--op") == 0 || (strcmp(operador, "-p")== 0))){
                   ope = argv[++i];
+                  bop = true;
             } else if (!(strcmp(operador, "--help"))){
                 printf("--in1|-1 nombre_archivo\n");
                 printf("--in2|-2 nombre_archivo\n");
@@ -188,7 +193,14 @@ int main(int argc, char *argv[]){
                 return 0;
             } else {printf("Se a introducido mal algun argumento para mas informacion --help\n"); return 0;}
         }
-        procesar_funciones(f1, f2, archS, ope, scal);
+        if((bf1 && bf2 && bfout && bop) || (bf1 && bfout && bop) || (bf2 && bfout && bop)) {
+            procesar_funciones(f1, f2, archS, ope, scal);
+        }
+        else {
+            printf("falta algun archivo");
+            return 0;
+
+        }
     } else {
         printf("argumentos insuficientes");
         return E_FORMAT_ERROR;
