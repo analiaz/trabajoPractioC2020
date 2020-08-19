@@ -63,10 +63,9 @@ error_t read_matrix(FILE *fp, matrix_t **m)
             
             ptr = strtok(NULL, separador); // se lee otra parte de la linea hasta encontrar el separador, siendo el primer parametro null para tomar desde el punto que dejo en la vez anterior que llame a strtok
           } else {
-              printf("hay un error en el archivo");
               free(linea);
               fclose(fp); 
-              return E_FILE_ERROR;
+              return E_OK;
           }
 				} 
 			}

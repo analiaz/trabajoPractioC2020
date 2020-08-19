@@ -19,25 +19,6 @@ void imprimir_Mat(matrix_t* m){
     }
 }
 
-/*
-int mainProfe (){
-    char *linea = malloc(sizeof(char)*100);
-    char separador[] = " ";
-    strcpy(linea, "1.2 3.4 4.5 6.6 ffff56.5 0.0");
-
-    char *ptr = strtok(linea, separador);
-    double value;
-
-    while(ptr != NULL){
-        int retVal = sscanf(ptr, "%lf", &value);
-        printf("RES %d VALUE %lf\n", retVal, value);
-        ptr = strtok(NULL, separador);
-    }
-    return 0;
-}
-
-*/
-
 int main(int argc, char *argv[]){
     printf("%d ", argc);
     for (int i = 0; i < argc; ++i){
@@ -56,8 +37,6 @@ int main(int argc, char *argv[]){
     matrix_t* resAso3 = NULL;
     matrix_t* null_prub = NULL;  
     matrix_t* idt_prub = NULL;
-
-  //  mainProfe();
 
     FILE* f = fopen(arch1, "r");
     if (f == NULL) {
